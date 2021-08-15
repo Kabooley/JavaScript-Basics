@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTML escape</title>
+  </head>
+
+  <body>
+    <div class="form">
+      <input type="text" name="textarea" class="input" />
+      <button class="escape">HTML ESCAPE</button>
+      <button class="encode">ENCODE URI</button>
+      <button class="clear">CLEAR FORM</button>
+    </div>
+
+    <div class="htmlescape-space">
+      <h1>HTML escape by JavaScript</h1>
+      <input type="textarea" class="output-escape" />
+    </div>
+
+    <div class="encodeURI-space">
+      <h1>URI escape</h1>
+      <input type="textarea" class="output-encode" />
+    </div>
+
+    <script>
+      "use strict";
+
+      var outputEsc = document.querySelector("input.output-escape");
+      var outputEnc = document.querySelector("input.output-encode");
+      var input = document.querySelector("input.input");
+
+      var escapeHTML = function (string) {
+        if (typeof string !== "string") return string;
+
+        return string.replace(/[&'`"<>]/g, function (match) {
+          return {
+            "&": "&amp;",
+            "'": "&#x27;",
+            "`": "&#x60;",
+            '"': "&quot;",
+            "<": "&lt;",
+            ">": "&gt;",
+          }[match];
+        });
+      };
+
+      document
+        .querySelector("button.escape")
+        .addEventListener("click", function (event) {
+          if (input.value !== "") {
+            outputEsc.value = escapeHTML(input.value);
+            outputEsc.focus();
+          }
+        });
+
+      document
+        .querySelector("button.encode")
+        .addEventListener("click", function (event) {
+          if (input.value !== "") {
+            var string = input.value.replace(/\r?\n/g, "");
+
+            outputEnc.value = encodeURI(string);
+            outputEnc.focus();
+          }
+        });
+
+      document
+        .querySelector("button.clear")
+        .addEventListener("click", function (event) {
+          input.value = "";
+          input.focus();
+        });
+    </script>
+  </body>
+</html>

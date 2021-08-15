@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>examples : json and localstorage</title>
+</head>
+<body>
+  <h1>This is how JSON and localStorage works!</h1>
+  <!-- 
+    JSONとは
+ひとまずデータ形式の型と思っていいよ！
+JSONというオブジェクトの型があると思っていいよ！
+連想配列とはことなりkeyもvalueも""で囲うよ
+
+
+JSON.parse(obj)とJSON.stringfy(obj)とは
+stringfyはオブジェクトをJSON型にエンコードして返すよ
+parseはJSONをjsで使えるオブジェクトにデコードして返すよ
+つまり
+obj -> JSON はstringfy(obj)
+JSON -> obj はparse(obj)
+   -->
+  <script>
+
+    'use strict';
+
+    {
+      // 通常localStorageはキーと値のワンペアしか保存できない
+      localStorage.setItem('mykey', 'myvalue');
+      var hoge = localStorage.getItem('mykey');
+
+      console.log(hoge);        // myvalueと表示される
+
+      // keytovalueの複数のデータを一挙に扱いたい場合、JSONの出番である
+      // これはJSON型であり、jsはJSON型を扱うことができる
+      var jsondata = {
+        "cat" : "tama",
+        "dog" : "pochi",
+        "snake" : "nyoro",
+        "owl" : "hakase"
+      };
+      // しかしlocalStorageへ保存する際は文字列型に変換する必要がある
+      var jsonKey = "animals";
+      // JSON.stringify()で文字列型にエンコードする
+      localStorage.setItem(jsonKey, JSON.stringify(jsondata));
+      // localStorage()からキーで取り出し、JSON型にデコードしている
+      console.log(JSON.parse(localStorage.getItem(jsonKey)));
+    }
+
+    {// メポ
+    // 制約
+    // jsはJSONをObjectにしないと使えない
+    // JSONは文字列型に変換しないとlocalStorage()へ保存できない
+    // localStorage()へ保存するときはキーを設定すること！ 
+
+      // JSON
+      var menu = {
+        "Ale" : "Hoegaarden",
+        "Storong" : "Derilium",
+        "piss-boy" : "Cantillon Geuze"
+      };
+      // save into localStorage then encode it to string type
+      localStorage.setItem(JSON.stringify(menu));
+      // get data from localStorage then make it Object type
+      var menu_object = JSON.parse(localStorage.getItem())
+
+
+      localStorage.setItem()
+    }
+    </script>
+</body>
+</html>

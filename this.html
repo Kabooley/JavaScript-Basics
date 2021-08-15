@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>how "this" works ?</title>
+  </head>
+  <body>
+    <h1>Learn about "this" of javascript</h1>
+    <script>
+      "use strict";
+
+      // グローバル・コンテキスト上では厳格モードかどうかにかかわらず、
+      // thisはグローバル・オブジェクトを指す
+      console.log("this === window: ", this === window); // true
+
+      // --------------------------------------------------------------
+      // 関数コンテキスト上では、
+      // thisは呼び出され方によってその値が異なる
+      // 実行コンテキストに入るときにthisの値が設定されていないと
+      //   undefinedのままになる
+      function f1() {
+        return this;
+      }
+      console.log("f1() === undefined: ", f1() === undefined); // true
+
+      // --------------------------------------------------------------
+      // オブジェクトの関数として
+      // そのthisにはメソッドが呼び出されたオブジェクトが設定される
+      //
+      // 関数コンテキストの中のthisであるが、オブジェクトのメソッドである場合、
+      // オブジェクトを指す
+      const jonas = {
+        name: "Jonas",
+        year: 1989,
+        calcAge: function () {
+          return 2021 - this.year;
+        },
+        whoIsThis: function () {
+          return this;
+        },
+      };
+
+      console.log(jonas.calcAge()); // 32
+      console.log(jonas.whoIsThis()); // オブジェクトjonasを指した
+
+      // 試しに後出しでf1()をjonasのメソッドとしたらどうなるか
+      jonas.whoIAm = f1;
+      console.log(jonas.whoIAm()); // オブジェクトjonasを指した
+
+      // クラス
+      // thisはPersonオブジェクトを指す
+      // thisは関数コンテキストの中では、指定しないとグローバルオブジェクトを指すのではなかったのではないのだろうか？
+      //
+      var Person = function (name, age) {
+        this.name = name;
+        this.age = age;
+      };
+
+      Person.prototype.whoIsThis = function () {
+        return this;
+      };
+
+      var Mike = new Person("Mike", 28);
+      console.log(Mike.whoIsThis());
+    </script>
+  </body>
+</html>
+
+<!-- 
+# this 
+
+thisはその値を呼び出される環境と呼び出され方によって変化する
+thisは実行コンテキスト生成時に同時に生成される変数の一つである
+一般的に、thisはthisが使われている関数の所持者の値をとる
+つまり
+thisはその値が固定ではない
+
+
+
+#### オブジェクトのメソッドとして
+- オブジェクトのメソッドとして呼び出されるとき、メソッドのthisはオブジェクトを指す
+- あとから関係ない関数をオブジェクトのメンバとして登録しても、その関数のthisはオブジェクトを指す
+
+
+#### OOPでのthis
+
+**ES6以前のVanillaJSでの話**
+
+アロー関数を使わないES6以前の開発においては以下のように
+各prototypeメソッドのthisを固定するように
+`var self = this;`としていた
+
+あるインスタンスがべつのインスタンスのメンバになっているようなとき
+thisをちゃんと管理しないとthisが指すものが意図しないものになりやすい
+
+例えば以下の場合
+
+```JavaScript
+// toggle()のthisはControllerインスタンスを指す
+// Controllerは
+  Controller.prototype.toggle = function (data) {
+    console.log('[Controller] toggle');
+    var self = this;
+    var completed;
+
+    completed = self.model.search(data.uid).completed;
+    console.log(completed);
+    self.model.update(
+      data.uid,
+      { completed: !completed },
+      // 無名関数で囲んで呼出さないとthisがｸﾞﾛｰﾊﾞﾙｺﾝﾃｷｽﾄをさすことになる
+      function () {
+        self.setView();
+      }
+    );
+  }
+
+
+    Model.prototype.update = function (id, updatedData, callback) {
+        console.log('[Model] update');
+        var self = this;
+        callback = callback || function () { };
+        var updatedItem = {
+            id: id,
+        }
+
+        Object.keys(updatedData).forEach(function (key) {
+            if (key === 'title') {
+                updatedItem.title = updatedData.title;
+            }
+            if (key === 'completed') {
+                updatedItem.completed = updatedData.completed;
+            }
+        });
+
+
+        self.store.write(updatedItem, callback);
+    }
+
+```
+
+Controllerインスタンスのprototype関数setView()を別のインスタンスに渡して実行してもらう
+このとき
+setView()のthisがControllerを指し続けるにはどうすればいいのか
+
+Controller.prototype.toggle()からModel.prototype.update()へ渡すとき
+- 無名関数で囲んで渡す : thisは各インスタンスをただしく指している
+- まんま関数を渡す: (厳格モードではないので)グローバルコンテキストを指す
+
+なぜか？
+
+
+
+
+
+ -->

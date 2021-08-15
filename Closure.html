@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Closure</title>
+  </head>
+  <body>
+    <h1>Learn about Closure</h1>
+
+    <p>make sense Closures ?</p>
+    <button id="closure">output name</button>
+    <div id="app">
+      <p>APP</p>
+    </div>
+
+    <h3 id="h3s">Try closure</h3>
+
+    <script>
+      /***********************************************
+       * javascript "Closure"
+       * 
+       * 必要な知識
+       *    ﾚｷｼｶﾙｽｺｰﾌﾟ
+       *    ﾎｲｽﾃｨﾝｸﾞ
+      ***********************************************/
+
+      {
+            // ﾚｷｼｶﾙｽｺｰﾌﾟ
+            // ネストされているような内部関数は、
+            // その外側のスコープで宣言された変数にアクセスすることができる
+
+            function myfunc(){
+                var name = "Michael";
+                function sayName(){
+                    console.log(name);
+                }
+                sayName();
+            }
+            myfunc();       // "Michael"
+      }
+
+
+      {
+          // クロージャ
+          // 外部関数に内部関数を渡して外部関数を実行しても
+          // 外部関数がかつて存在していた親関数の変数をスコープできる
+
+          function makeFunc(){
+              var name = "Mozilla";
+              function displayName(){       // displayNameはnameをスコープできる
+                  alert(name);
+              }
+              return displayName;
+            }
+
+            var myFunc = makeFunc();
+            myFunc();       // Mozillaでアラートが発生される
+
+            // なぜ内部関数はかつての親関数のスコープを維持できるのか？
+            // makeFunc()は内部関数を返すだけなので
+            // myFuncのスコープからnameは外れるはずでは?
+
+            // その答えがクロージャ
+
+            // ｸﾛｰｼﾞｬは関数と関数が作られた環境という2つの組み合わせによって生成される
+            // 
+            // 作られた環境とは
+            // displayName()はmakeFunc()で作られた、なので
+            // displayNameはmakeFuncへのﾚｷｼｶﾙｽｺｰﾌﾟを保持して渡される
+            // これはポインタのようなものである
+
+            // クロージャの作り方
+
+            // 関数内部で、thisじゃなくて内部定義として関数を宣言する
+      }
+
+
+      // 最終的にはthisとクロージャで合わせて使う方法を理解したい
+      {
+          (function(window){
+            'use strict';
+
+            function Hoge(){
+                this.name = "Hoge";
+            }
+
+            Hoge.prototype.sayMyName = function(){
+                return this.name;
+            }
+
+          })(window);
+      }
+    </script>
+  </body>
+</html>

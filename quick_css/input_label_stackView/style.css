@@ -1,0 +1,172 @@
+/* 
+# 
+これはチェックボックスをスタイリングしたものである
+
+checkboxを見た目上消して代わりにlabelをcheckbox代わりにスタイリングするのを
+試みたものである
+
+
+### 前提：知らなくてはならないこと
+HTML <label>:https://developer.mozilla.org/ja/docs/Web/HTML/Element/label
+for 属性: 
+CSS content プロパティ:https://developer.mozilla.org/ja/docs/Web/CSS/content
+SVG:https://developer.mozilla.org/ja/docs/Web/SVG
+
+
+### SVG
+
+.svgというファイル名で使用可能なxmlベースのマークアップ言語
+とか言われているけど
+ひとまずそんな図形ができると思えばOK
+
+
+
+
+
+### やること
+input[type="checkbox"]をスタイリングする
+inputを見た目上消す
+labelをinputと関連付ける
+labelの位置を任意の位置に配置する
+labelに見た目checkboxな値を設ける
+
+>>EXTRA<<
+labelのもともとのtextContentをクリックしてもチェックボックスが反応しないようにして、
+label:beforeのクリックにだけ反応するようにする
+
+
+*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: sans-serif;
+}
+
+
+/* ------------------------------------------------------------- */
+/* YOUTUBE LECTURE  (かなり関係ない)*/
+/* ------------------------------------------------------------- */
+.youtubeLecture {
+    height: 30vh;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: column;
+    font-family: sans-serif;
+}
+
+
+.form {
+    width: 50%;
+    position: relative;
+    height: 50px;
+    overflow: hidden;
+}
+
+.form input {
+    width: 100%;
+    height: 100%;
+    color: grey;
+    border: none;
+    padding-top: 20px;
+    outline: none;
+}
+
+.form label {
+    position: absolute;
+    bottom: 0px;
+    left: 0%;
+    height: 100%;
+    width: 100%;
+
+    /* background-color: cyan; */
+
+    pointer-events: none;
+    border-bottom: 1px solid black;
+}
+
+
+.form label::after {
+    content: "";
+    position: absolute;
+    left: 0px;
+    bottom: -1px;
+    height: 100%;
+    width: 100%;
+    border-bottom: 3px solid #5faBb3;
+
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.content-name {
+    position: absolute;
+    bottom: 5px;
+    left: 0px;
+    transition: all 0.3s ease;
+}
+
+.form input:focus + .label-name .content-name, 
+.form input:valid + .label-name .content-name {
+    transform: translateY(-150%);
+    font-size: 14px;
+    color:  #5faBb3;
+}
+
+
+.form input:focus + .label-name::after,
+form input:valid + .label-name::after
+{
+    transform: translateX(0%);
+}
+
+
+
+
+/* --------------------------------------------------- */
+/* animation checkbox */
+/* https://www.youtube.com/watch?v=tOggA9H9t-k */
+/* --------------------------------------------------- */
+.checkboxStyleLecture {
+    display: relative;
+    height: 50vh;
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.checkboxStyleLecture h1 {
+    border-left: 5px solid #5faBb3;
+    padding-left: 16px;
+}
+
+/* checkboxを消す */
+.xd {
+    display: none;
+}
+
+.xd + label.xd-label {
+    position: relative;
+}
+
+.xd + label.xd-label:before {
+    content: "";
+    background: url("checkbox.svg");
+    background-position: center;
+    background-size: contain;
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    left: -44px;
+    top: -8px;
+}
+
+
+
+
+

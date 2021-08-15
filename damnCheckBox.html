@@ -1,0 +1,318 @@
+<!-- 
+program:    checkboxのチェック状態を取得するプログラム
+
+
+
+ -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="css/done_task_style.css" disabled="false" id="done-style">
+  <link rel="stylesheet" href="css/Not_done_task_style.css"  disabled="true" id="not-done-style">
+  <title>Is it checked??</title>
+  <style>
+
+  </style>
+</head>
+<body>
+  <h1>Is Check box checked? </h1>
+
+
+  <div id="app">
+    <ul id="app-ul">
+      <li><input type="checkbox" name="checkbox" class="checkbox"><label>click!</label></li>
+      <li><input type="checkbox" name="checkbox" class="checkbox"><label>click!</label></li>
+      <li><input type="checkbox" name="checkbox" class="checkbox"><label>click!</label></li>
+      <li><input type="checkbox" name="checkbox" class="checkbox"><label>click!</label></li>
+      <li><input type="checkbox" name="checkbox" class="checkbox"><label>click!</label></li>
+    </ul>
+  </div>
+
+  <div id="dynamic">
+    <input type="text" name="input-task" id="input-task">
+    <input type="text" name="another-task" id="input-another">
+    <ul id="dynamic-ul">
+      <li><label>Dynamic generated checkbox</label></li>
+    </ul>
+  </div>
+
+  <script>
+    'use strict';
+    
+    // -------------------------------------------------------------------------------------
+    //  make sure how dynamic generated checkbox works
+    // -------------------------------------------------------------------------------------
+  //   {
+  //     window.onload = ()=> {
+
+  //       console.log("window.onload");
+
+  //       const gCheckBoxes = document.getElementsByClassName('checkbox');
+  //     let gArrayCheckBoxes = Array.prototype.slice.call(gCheckBoxes);
+
+
+
+  //       // if clicked
+  //       // clickされれば問答無用で発火するので、
+  //       // どこをクリックされたかに制限する必要がある
+  //       const clicked = document.addEventListener('click', (e)=>{
+
+  //         console.log("click event has listened");
+
+  //         // e.preventDefault();
+  //         // 
+  //         const checkboxes = document.getElementsByClassName("checkbox");
+
+  //         console.log('checkboxes[0]');
+  //         console.log(`checkboxes[0] : ${checkboxes[0]}`);
+  //         console.log(`checkboxes[0].checked: ${checkboxes[0].checked}`);
+  //         console.log('checkboxes[1]');
+  //         console.log(`checkboxes[1] : ${checkboxes[1]}`);
+  //         console.log(`checkboxes[1].checked: ${checkboxes[1].checked}`);
+  //         console.log('checkboxes[2]');
+  //         console.log(`checkboxes[2] : ${checkboxes[2]}`);
+  //         console.log(`checkboxes[2].checked: ${checkboxes[2].checked}`);
+  //         console.log('checkboxes[3]');
+  //         console.log(`checkboxes[3] : ${checkboxes[3]}`);
+  //         console.log(`checkboxes[3].checked: ${checkboxes[3].checked}`);
+  //         console.log('checkboxes[4]');
+  //         console.log(`checkboxes[4] : ${checkboxes[4]}`);
+  //         console.log(`checkboxes[4].checked: ${checkboxes[4].checked}`);
+
+  //         let arr = Array.prototype.slice.call(checkboxes);
+  //         for(let i = 0; i < arr.length; i++){
+  //           // .checkedでの判定は問題ない
+  //           if(arr[i].checked === true){
+  //             console.log(`ID: ${i} has checked!`);
+  //             arr[i].checked = arr[i].checked;
+  //             gArrayCheckBoxes[i].checked = gArrayCheckBoxes[i].checked;
+  //             gCheckBoxes[i].checked = gCheckBoxes[i].checked;
+
+  //             // INFO
+  //             console.log(`arr[${i}].checked === ${arr[i].checked}`);
+  //             console.log(`gArrayCheckBoxes[${i}].checked === ${gArrayCheckBoxes[i].checked}`);
+  //           }
+  //           else{
+  //             console.log(`ID: ${i} has not checked!`)
+  //             arr[i].checked = arr[i].checked;
+  //             gArrayCheckBoxes[i].checked = gArrayCheckBoxes[i].checked;
+  //             gCheckBoxes[i].checked = gCheckBoxes[i].checked;
+
+  //           }
+  //         }
+
+  //         // INFO
+  //         console.log('gArrayCheckBoxes');
+  //         console.log(gArrayCheckBoxes);
+  //         console.log('arr');
+  //         console.log(arr);
+  //       });
+  //     }
+  // }
+
+
+  // -----------------------------------------------------------------------------
+  // event の発火条件を試してみる
+  // -----------------------------------------------------------------------------
+  // {
+  //   const  ENTER_KEY_CODE = 13;
+
+
+  //   // enter keyが押されたら問答無用で発火する
+  //   document.addEventListener('keyup', (e)=>{
+  //     if(e.keyCode === ENTER_KEY_CODE){
+  //       console.log("document.addEventListener() has fired!");
+  //     }
+  //   });
+  //   // 取得したdom要素内でイベントが発生したら発火する
+  //   const inputtypeform = document.getElementById('input-task');
+  //   inputtypeform.addEventListener('keyup', (e)=>{
+  //     if(e.keyCode === ENTER_KEY_CODE){
+  //       console.log("inputtypeform.addEventListener() has fired!");
+  //     }
+  //   });
+  //   // 同様。
+  //   const anothertypeForm = document.getElementById('input-another');
+  //   anothertypeForm.addEventListener('keyup', (e)=>{
+  //     if(e.keyCode === ENTER_KEY_CODE){
+  //       console.log("anothertypeForm.addEventListener() has fired!");
+  //     }
+  //   });
+
+  //   const div_dynamic = document.getElementById('dynamic');
+  //   div_dynamic.addEventListener('click', ()=>{
+  //     console.log("div id='dyanamic' dom has caught click event");
+  //   });
+  // }
+
+
+  {
+
+    // NAMESPACE and CONSTANTS --------------------------
+
+    const CHECKBOX_CLASS_NAME = "DynamicGeneratedCheckBox";
+    const ENTERKEY_CODE = 13;
+    // -------------------------------------------------------------
+
+    window.onload = () =>{
+
+      const div_dynamic = document.getElementById('dynamic');
+      const input_task = document.getElementById('input-task');
+      
+
+      input_task.addEventListener('keyup', (e)=>{
+        if(e.keyCode === ENTERKEY_CODE){
+          // li, input, labelを生成する
+          let li_task = document.createElement('li');
+          li_task.setAttribute("class", "li_task");
+          let checkbox = document.createElement('input');
+          checkbox.setAttribute("type", "checkbox");
+          checkbox.setAttribute("name", "checkbox");
+          checkbox.setAttribute("class", CHECKBOX_CLASS_NAME);
+          let label = document.createElement('label');
+          const label_text = document.querySelector("input#input-task");
+          console.log('label_text');
+          console.log(label_text);
+          label.value = label_text.value;
+          console.log("label's value");
+          console.log(label.value);       // <= ちゃんとはいっている
+          label.innerText = label.value;
+
+          li_task.appendChild(checkbox);
+          li_task.appendChild(label);
+          let ul_dynamic = document.getElementById('dynamic-ul');
+          ul_dynamic.appendChild(li_task);
+          
+          deleteTypedTxt('input-task');
+          // document.getElementById('not_done_style').disabled = false;
+        }
+      });// end input_task.addEventListener()...
+
+
+
+      function deleteTypedTxt(id){
+        let input_text_element = document.getElementById(id);
+        if(input_text_element.value !== ""){
+          input_text_element.value = "";
+        }
+      }
+
+
+      // ===================================
+      // click event part
+      // ===================================
+
+      // クリックイベントを受け取る要素を予め制限する
+      // ulタグ内部でクリックイベントが起こったら発火する
+      // 
+      // constだけど例えばkeyUpでul#dynamic-ulが変更されると
+      // その変更はちゃんと反映される
+      const clicked = document.getElementById('dynamic-ul');
+
+      clicked.addEventListener('click', ()=>{
+
+        console.log('dynamic-ul click event has caught! ');
+        console.log('DOM: clicked includes...');
+        console.log(clicked);
+
+        // ul id="dynamic-ul"タグ内の要素がクリックされるたびに
+        // 動的生成のcheckboxをHTMLCollectionで取得する
+        const checkEls = document.getElementsByClassName(CHECKBOX_CLASS_NAME);
+        
+        // HTMLCollectionを配列に変換するまでもないみたい
+        // let array_checkEls = Array.prototype.slice.call(checkEls);
+
+        for(let x = 0; x < checkEls.length; x++){
+            if(checkEls[x].checked === true){
+              console.log(`checkEls[${x}] has checked`);
+              thisHasCheckedStyle(x);
+
+            }
+            else{
+              console.log(`checkEls[${x}] has not checked`);
+            
+            }
+        }
+
+      });
+      
+
+      // fucntions
+      // delete array element
+      // 
+      // .shift() 先頭の要素が削除される,戻り値で削除した要素を返す
+      // .splice(start, target) startから数えたtargetの番号の要素を削除する
+      // delete element elementを削除する ただし配列はその後整列されないず、もとの要素はundefinedである
+      function deleteTasks(index){
+        const tasks = document.getElementsByClassName('dynamic-ul');
+
+      }
+
+      // 完了したタスクはスタイルを充てる
+      // <label>task</label>のlabelタグに
+      // 
+      // styleを充てる前に
+      // labelにアクセスできない....
+      function thisHasCheckedStyle(index){
+        const checkedElement = document.getElementsByClassName('li_task');
+        console.log(checkedElement[index]);
+        // .labelだとundefined
+        // .childrenだとHTMLCollectionとして子要素を取得できた
+        // console.log(checkedElement[index].children);
+        let arr_checkedElement = Array.prototype.slice.call(checkedElement[index]);
+        arr_checkedElement.style.
+      }
+       
+
+    }// end window.onload...
+  }
+  </script>
+</body>
+</html>
+
+
+<!-- 
+あるある）checkboxにチェックがされたままにならない
+  ->
+  addEventListener('click')で発火するときに
+  e.preventDefault()をすると
+  checkboxをクリックしてもcheckedがtrueにならない!
+
+  =>
+  ということで
+  e.preventDefault()を無効にする
+  clickしたらイベントリスナが発火するので
+  checkedはイベントキャッチしたらtrueである
+  なので
+  arr[i].checked = !arr[i].checked; じゃなくて
+  arr[i].checked = arr[i].checked;  である
+  前者はfalseにしてしまっている
+  後者はtrueにできている
+
+  ただそれだけだった
+
+
+次  動的にチェックボックスを生成して
+  そいつを取得して
+  チェック状態を判定する
+
+
+あるある) appendChildとinput要素の生成についての問題
+
+  input要素.appencChild(label要素とか);
+  とすると次が生成される
+  <input> <label>何かテキスト</label> </input>
+  これの何が問題化というと
+  </input>に他ならない
+
+  <input /><label>テキスト</label>
+  とするにはどうしたらいいのか...はおいておいて
+  appendChildの順番を変えることにする
+
+
+
+
+ -->

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>form</title>
+</head>
+
+<body>
+    <h1>learn form behavior</h1>
+    <form action="" method="post" id="form">
+        <div>
+            <label>
+                Emter your name :
+                <input type="text" name="name" required>
+            </label>
+        </div>
+        <div>
+            <label>
+                Emter your email :
+                <input type="text" name="email" required>
+            </label>
+        </div>
+        <input type="submit" value="Subscribe" id="submitter">
+    </form>
+    <p id="log"></p>
+
+    <script>
+        'use strict';
+
+        /*
+        submitイベントは、
+        form自身から発生する
+        input type="submit"やbuttonからは発生しない
+        ただし、
+        それ等が引き金になってsubmitイベントは発生する
+
+        何が言いたいのかというと、
+        formElement.addEventListener('submit')でしかsubmitイベントはキャッチできなくて、
+        inputやbuttonではsubmitイベントはキャッチできないよ
+        ということ
+
+
+        enterキーでも送信できる
+        その際、
+        SubmitEvent.submitterにはformの中で一番優先的なform送信要素が選ばれている
+        
+
+        */
+
+        {
+            const form = document.getElementById('form');
+            const submitterInput = document.getElementById('submitter');
+            const log = document.getElementById('log');
+
+            const logSubmit = event => {
+
+                log.textContent = `${event}`;
+                console.log(event);                 // SubmitEventを出力する
+                event.preventDefault();         // よく、preventDefault()は最後の行に追加されがち
+            }
+
+            form.addEventListener('submit', (event) => {
+                console.log("submitted");
+                logSubmit(event);
+            });
+
+            // こちらは機能しない
+            // 理由は先に述べた通り
+            submitterInput.addEventListener('submit', (event) => {
+                console.log("submitted");
+                logSubmit(event);
+            });
+        }
+    </script>
+</body>
+
+</html>

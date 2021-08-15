@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>All about Object of javascript</title>
+</head>
+<body>
+  <h1> JUST MAKE SURE JS OBJECT!!</h1>
+  
+  <script>
+    'use strict';
+
+console.log('== ARRAY ===========================');
+
+    //  == ARRAY =============================
+    {
+      // pretty basic
+      const scores = [80, 90, 40];
+      // 配列がオブジェクトとして出力される
+      console.log(scores);
+
+      scores[2] = 44;
+      console.log(scores);
+      // なぜconstで値の変更ができるのか？
+      // たぶんscoresはポインタであるから
+
+      // 要素へのアクセス
+      console.log(`Score: ${scores[0]}`);
+      console.log(`Score: ${scores[1]}`);
+      console.log(`Score: ${scores[2]}`);
+      
+      // loop処理
+      for(let i = 0; i < scores.length; i++){
+        console.log(`Score: ${scores[i]}`);
+      }
+
+      // 
+      // 要素の追加、削除など
+      // 
+      //unshift(): 配列の先頭に追加
+      // shift(): 配列の先頭から要素を取り出す
+      // push(): 配列の末尾に追加
+      // pop(): 配列の末尾から要素を取り出す
+
+      // 99, 55, 10が配列の末尾に追加される
+      scores.push(99, 55, 10);
+      console.log(scores);
+
+      // 先頭の要素が削除された
+      scores.shift();
+      console.log(scores);
+
+      // splice(変化が開始する位置, 削除する要素数, 追加する要素);
+      // 位置とはインデックスである
+      //
+      // 下記はインデックス１の44が削除されて40, 50がインデックス１番から追加ｓれテイル 
+      scores.splice(1, 1, 40, 50);
+      console.log(scores);
+
+      // 
+      // spread code
+      // 
+      console.log(' ---- spread code ----');
+      const otherScores = [10, 20];
+      const mathScores = [80, 90,40, 70, ...otherScores];
+      console.log(mathScores); 
+
+      function sum(a, b){ console.log( a+b);}
+      // otherScores[0] + otherScores[1]と同じ
+      sum(...otherScores);
+
+      // 
+      // 分割代入
+      // 配列の要素を入れ替えるときとかすっごく便利
+      // 
+      console.log(' --- Destructuring assignment --- ');
+      const numbers = [11, 22, 33, 44];
+      const [a, b, c, d] = numbers;
+      console.log(a);
+      console.log(b);
+      console.log(c);
+      console.log(d);
+
+
+      // 
+      // forEach()
+      // forEach(currentElement, index, array)
+      console.log(' --- forEach() ---- ');
+      scores.forEach( (score, index)=>{
+        console.log(`index: ${index}, score: ${score}`);
+      });
+
+
+      // 
+      // map()
+      // 与えられたすべての要素に対して呼び出し、
+      // その結果からなる新しい配列を生成する
+      // 
+      console.log(' --- Array.prototype.map() --- ');
+      const prices = [100, 190, 220];
+      const updatedPrices = prices.map((price)=>{
+        return price + 20;
+      });
+      console.log(updatedPrices);
+
+
+      // 
+      // filter()
+      // 引数として与えられたテスト関数を各配列要素に対して実行して
+      // それに合格したすべての配列要素からなる新しい配列を生成する
+      // 
+      console.log(' --- Array.prototype.filter() ---');
+      const nums = [32, 454, 31, 6674, 908];
+      // const evenNums = nums.filter(number => {
+      //   if(number % 2 === 0){
+      //     return true;
+      //   }
+      //   else {
+      //     return false;
+      //     }
+      // });
+      const evenNums = nums.filter(number => number % 2 === 0);
+      console.log(evenNums);
+    }
+
+
+
+console.log("== OBJECT ==========================");
+
+
+    //  == OBJECT  ==================================
+    {
+      // object basic
+      const point = {
+        x: 100, 
+        y:180,
+        // 最後にカンマを残すのは後から追加や削除しやすくするため
+        };
+
+        // use properties
+        console.log(point.x);
+        console.log(point['y']);
+        console.log(point.x = 120);
+        // 追加
+        console.log(point.z = 380);
+        // 削除
+        delete point.y;
+        console.log(point);
+
+        // 
+        // spread
+        // 
+        console.log(' ---- spread ------ ');
+        const otherProps = {
+          r: 4,
+          color: 'red',
+        };
+        const props = {
+          x: 133,
+          y: 216,
+          ...otherProps,
+        };
+        console.log(props);
+        
+        // 
+        // 分割代入
+        // 
+        const {x, r, ...others} = props;
+        console.log(x);
+        console.log(r);
+        console.log(others);
+
+        // 
+        // Object.keys()
+        // 
+        console.log(' --- Object.keys() ---- ');
+        const pts = {
+          x: 180,
+          y: 90,
+        };
+        // ptsのすべてのキーを配列で取得できる
+        const keys = Object.keys(pts);
+        // forEach()は呼び出しオブジェクトのすべての要素に対して、
+        // 与えられた関数を一度ずつ実行する
+        keys.forEach(key =>{
+          console.log(`key: ${key} Value: ${pts[key]}`);
+        });
+        // 多分多次元配列的な感じのアクセス方法
+        const pointers = [
+          {x: 30, y: 60},
+          {x: 10, y: 40},
+          {x: 70, y: 120},
+        ];
+        console.log(pointers[2].y);
+    }
+
+    // 
+    {
+    }
+
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="js">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>How deep "THIS" keyword in shit !!!</title>
+</head>
+<body>
+  <h1>how "bind" works?</h1>
+
+  <div id="app">
+
+  </div>
+
+
+  <script>
+    /****************************************************
+      .bind() 基礎
+
+      SYNATX :  function.bind(thisArg, arg1, arg2,....)
+        thisArg : this値
+        バインドされた関数が呼び出される際にターゲット関数にthisとして渡される値である
+        下記のBASICの例でいえば
+        var boundGetX = retrieveX.bind(module);
+        moduleがバインドされた関数で、
+        ターゲット関数がretrieveXで、
+        retrieve.bind(module)によって生成されるのが
+        moduleがバインドされたretrieveの新しい関数(コピー)である
+        retrieveのthisはmoduleに結びつく
+    ****************************************************/
+
+    {
+      /** BASIC **/
+      
+      this.x = 9;
+      var module = {
+        x : 81,
+        getX : function(){return this.x;}
+      };
+      // module.getX関数内のthis.xはスコープチェーンで
+      // その関数の一番近い外側の同じ名前の変数を参照する
+      console.log(module.getX());        // expect : 81
+
+      // module.getXだけをretrieveXへ代入したので
+      // module.xは関係なくなった。
+      // よってthis.xはグローバルコンテクストの方を参照する
+      var retrieveX = module.getX;
+      console.log(retrieveX());            // output: 9
+
+      // オブジェクトをバインドしたので
+      // module.xを参照する
+      var boundGetX = retrieveX.bind(module);
+      console.log(boundGetX());                            // expect: 81
+    }
+
+    {
+      /*
+      ** 部分的に適用された関数 **
+      
+      予め引数が指定された関数を生成する
+      下記のlist.bind(null, 37)が「予め引数を指定された関数」
+      null はthis値になるべき部分である
+      なので指定する引数は第二引数以降に指定する
+
+      バインドされた関数がいつ呼び出されても
+      この指定した引数を先頭にした引数を受け取る関数を作成することができる
+      */
+
+      function list() {
+        return Array.prototype.slice.call(arguments);
+      }
+
+      // ふつう
+      var list1 = list(1,2,3);  
+      console.log(`list1 ${list1}`);      // 1,2,3
+
+      // leadingThirtysevenList は　37だけ入っている配列
+      var leadingThirtysevenList = list.bind(null, 37);
+      var list2 = leadingThirtysevenList();
+      console.log(`list2 ${list2}`);
+
+      // 
+      var list3 = leadingThirtysevenList(1,2,3);
+      console.log(`list3 ${list3}`);
+    }
+
+    {
+      /*
+      bindされた関数は自動的にnew演算子を使って
+      ターゲット関数の新しいインスタンスを構築できるようになっている
+
+      下記の例で何をしているかというと
+      全然わからん笑
+      */
+
+      function Point(x, y) {
+        this.x = x; this.y = y;
+      }
+
+      Point.prototype.toString = function() {
+        return this.x + ',' + this.y;
+      };
+
+      var p = new Point(1, 2);
+      console.log(p.toString());      // 1,2
+
+      var YAxisPoint = Point.bind(null, 0);   // 第一引数を0に強制したPointを生成する
+      console.log(YAxisPoint.toString());     // まだインスタンスじゃないのでこれはPintのコピー
+      var aaa = new YAxisPoint(10);
+      console.log(aaa.toString());              // 0, 10
+      
+      var emptyObj = {};
+
+      var YAxisPoint = Point.bind(emptyObj, 0); // 新たに生成された関数ではthisはemptyObjを指す
+      var axisPoint = new YAxisPoint(5);
+      console.log(axisPoint.toString());      // 0, 5
+    }
+
+
+    console.log("--- about Arrow-function ---");
+
+
+    {
+      /** Arrow function **/
+
+      /*
+      "thisを束縛しない"
+        
+        アロー関数以前...
+          ・コンストラクタでは新しいオブジェクト
+          ・strictモードではundefined
+          など -> オブジェクト指向開発において煩わしい方法であるというのは一般認識の模様
+
+        ES3/5 では...
+            this = self;ができるように
+
+        ES6...
+            アロー関数の登場 
+            アロー関数はthisをもたない。ﾚｷｼｶﾙｽｺｰﾌﾟのthis値を使う とのこと
+
+        ﾚｷｼｶﾙｽｺｰﾌﾟ...
+            変数のスコープはソースコード内の位置によって決定され、
+            入れ子にされた関数は外側のスコープで宣言された変数にアクセスする
+            ことができる...というあれ
+
+        つまりアロー関数のthisはスコープにthis値がない場合、
+        外部のthisを参照する
+
+        >>> レガシーコードとアロー関数は(というかES6以降の変更)は混ぜるな危険!! <<<
+
+
+        他、特に確認しないけどアロー関数の特徴
+            argumentsオブジェクトを持たないからargumentsは使えない
+            newは使えない　アロー関数はコンストラクタとして使えない
+            アロー関数にはpropertyはない
+            
+      */
+
+        // LEGACY in non-strict mode...
+        function lgcyPerson() {
+            // コンストラクタのthisはlgcyPersonのインスタンスを指す
+            this.age = 11;
+            // setTimeout内のthisはグローバルオブジェクトを参照する
+            // なのでthis.ageを参照しない
+            setTimeout(function growUp(){this.age++;}, 1000);
+        }
+        var one = new lgcyPerson();
+
+        // post ES6 ...
+        function Person() {
+            this.age = 111;
+            // ﾚｷｼｶﾙｽｺｰﾌﾟなのでsetTimeoutのthisはthis.ageを参照する
+            setTimeout(function growUp(){this.age++}, 1000);
+        }
+        var es6p = new Person();
+
+
+        // strict modeのthis規制は、thisがﾚｷｼｶﾙなもので渡される場合無視される
+        // つまり
+        // アロー関数でなければthis===undefinedなのでfalseになるが
+        // strictのthis規制がなくなるということは
+        // 'use strict'がないのと同じでつまりグローバルオブジェクトを参照する
+        var f = () => {'use strict'; return this;};
+        console.log(f() === window);        // 
+    }
+
+    console.log(" --- how to use apply() , call() and bind() ---　");
+
+      {
+
+      }
+
+    console.log(" --- re-comprehensive ---");
+
+    //      復習
+    {
+
+        /***BASIC bind() ***/
+
+      var xxx = 8;
+      var model = { xxx: 99, getX : function(){return this.xxx;}};
+      // this.xxxはmodel.xを参照する
+      // 理由はmodel.getXから見て一番近い自身の外部における同名オブジェクトを参照するから
+      console.log(model.getX());    // 99
+      var newgetx = model.getX;
+      // この場合は８を出力する
+      // 理由はthisの振る舞いがかわり
+      // newgetxにとってのthisに変化することで
+      // newgetxからみたxxxはxxx = 8のほうになるから
+      // (model.xxxはnewgetxのスコープから外れている)
+      console.log(newgetx());       // 8
+      // このmodel.xxxをスコープする方法が.bindである
+      // bind()の第一引数modelはnewgetxにとってのthisとなる
+      // 講師て新たに生成された関数scopexxxのthisはmodelを指す
+      var scopexxx = newgetx.bind(model);
+      console.log(scopexxx());   // 99
+
+      // .bind()という感じにthisArgに何も渡さなかったら
+      // newgetxと同じこと
+      var nothis = newgetx.bind();
+      console.log(nothis());      // 8
+
+        /*** BASIC this ***/
+        /*
+            ・いずれの関数の外部であればstrictモード如何に因らずthisはグローバルオブジェクトを参照する
+            ・strictモードでない、且つ呼出時にthisの値がセットされていないとき、thisはデフォルトでグローバ ルオブジェクトになる
+            ・strictモードでは、thisは実行ｺﾝﾃｸｽﾄに入った時に設定された値が残る
+        */
+        console.log(this === window);   // true
+        function f1(){return this;}
+        console.log(f1()===window);     // true
+        function f2(){'use strict'; return this;}
+        console.log(f2()===undefined);  // true
+
+    }
+
+    console.log(" --- analyze vanillajs of todomvc --- ");
+
+    {
+      function Controller(view){
+        // constructor
+        var self = this;
+        self.view = view;
+
+        // 
+      }
+    }
+  </script>
+</body>
+</html>
+
+<!-- 
+  bindとthisの話以外の今回出てきた小技
+
+
+
+function list() {return Array.prototype.slice.call(arguments);}
+
+  "arguments" : 関数へ渡された引数を含む、関数内でのみアクセス可能な配列のようなオブジェクト
+  Array.prototype.slice.call(arguments) :
+    argumentsオブジェクトは配列ではないので配列にする処理
+    つまりlistは受け取った引数を配列にする関数ということ
+
+-->

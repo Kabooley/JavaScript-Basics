@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document Object Model</title>
+</head>
+<body>
+  <h1>JUST MAKE SURE DOM!!</h1>
+
+  <div id="target">TARGET</div>
+
+  <!-- ul要素グループ１ -->
+  <ul>
+    <li>off</li>
+    <li>off</li>
+    <li>off</li>
+    <li>off</li>
+    <li>off</li>
+  </ul>
+
+  <!-- ul要素グループ２ -->
+  <ul>
+    <li>item</li>
+    <li>item</li>
+    <li>item</li>
+    <li>item</li>
+    <li>item</li>
+  </ul>
+
+  <!-- id付きのdiv要素グループ -->
+  <div id="todo-list">
+    <ul>
+      <li>make project progress</li>
+      <li>apply mycode to github</li>
+      <li>walk over 30 minutes a day</li>
+    </ul>
+  </div>
+
+   <!-- 再描画div要素グループ -->
+   <div id="save-and-rewrite">
+    <ul>
+      <li>mariah carey</li>
+      <li>it's like that</li>
+      <li>I'll be loving U long time</li>
+    </ul>
+  </div>
+
+
+  <!-- id付きのdiv要素グループ -->
+  <script>
+    'use strict';
+
+    {
+      // document.body.textContent = "Hello!";
+      // document.title = "changed!";
+
+      // 
+      // 要素の取得はこう分けろ
+      // 
+      /*
+      document.getElementById('target');        // idで取得する
+      document.querySelector('form button');  // 柔軟に取得できる
+      document.querySelectorAll('ul.menu > li');  // 複数だったら
+      */
+      
+      
+      //
+      // 要素へのアクセス
+      // 
+      console.log(' --- getElementById() --- ');
+      // getElementById()
+      var target = document.getElementById('target');
+      console.log(target);
+
+      // querySelector()
+      // console.log(' --- querySelector() --- ');
+      // document.querySelector('h1').textContent = 'Title!';
+      // document.querySelectorAll('li').forEach( li => {
+      //   li.textContent = 'lis!';
+      // });
+      // 
+      // :nth-child()
+      //  兄弟要素のグループの中での位置に基づいて選択する
+      //  例えば下記はbody.ul.liのグループの中で、
+      //  奇数番目の要素だけを抜き出している
+      // document.querySelectorAll('li:nth-child(odd)').forEach( li => {
+      //   li.textContent = 'odds';
+      // });
+
+
+      // 上記のアクセス方法はbody内のli要素に無差別にアクセスする
+      // なのでコントロールする必要がある
+      // 例)
+      // div id="todo-list"の各要素にアクセスする方法
+        
+
+        // 
+        // 親要素、子要素の取得
+        // 
+
+        // まず普通に
+        console.log("--- get parentNode, children ---");
+        const ul = document.querySelector('ul');
+        console.log('ul');
+        console.log(ul);
+        console.log('ul.parentNode');
+        console.log(ul.parentNode);
+        console.log('ul.children');
+        console.log(ul.children);
+
+        // body内にはliは主に3種類あるが、
+        // どうやら一番上のliタグを選択するようである
+        const li = document.querySelector('li');
+        console.log('li');
+        console.log(li);
+        console.log('li.parentNode');
+        console.log(li.parentNode);
+        console.log('li.children');
+        console.log(li.children);
+
+        // id付きのdivを選択する
+        const divid = document.querySelector('div#todo-list');
+        console.log('divid');
+        // div id = "todo-list" の中身が表示される
+        console.log(divid);
+        console.log('divid.children');
+        // HTMLcollectionが返される
+        // これは読み取り専用のプロパティである
+        console.log(divid.children);
+        console.log('divid.children loop');
+        // HTMLcollectionの全要素にアクセスする
+        // しかしdivの下はulなので要素はたった一つ
+        var elementChildren = divid.children;
+        for(let i = 0; i < elementChildren.length; i++){
+          console.log(elementChildren[i].tagName);
+          console.log(elementChildren[i]);
+        }
+
+        // children.childrenはいけるか？
+        // -> undefined
+        var grandchild = divid.children.children;
+        console.log(grandchild);
+
+        // 以下はli要素にアクセスできる
+        // querySelectorでulタグを指定する
+        const li2 = document.querySelector('div#todo-list ul');
+        console.log('div id="todo-list ul"');
+        console.log(li2);
+        var todos_li = li2.children;
+        for(let i = 0; i < todos_li.length; i++){
+          console.log(todos_li[i].tagName);
+          console.log(todos_li[i]);
+          console.log(todos_li[i].textContent);
+        }
+
+        // 
+        // TRY
+        // 
+        // body内の要素をすべて消して、また全く同じものを書き込んでみよう
+        // 保存する工程
+        // 消します
+        // 再度書き込む工程
+        // memory : htmlの内容を保存するオブジェクト
+        // *****************************************************************
+        // console.log("***************************************************");
+        // console.log(" --- save and rewrite --- ");
+        // var memory = { li_lists : [] ,};
+        // const li3 = document.querySelector('div#save-and-rewrite ul');
+        // const saveAndRewriteLis = li3.children;
+        // console.log(" << write li object into memory.li_lists>>");
+        // for(let x = 0; x < saveAndRewriteLis.length; x++){
+        //   console.log(saveAndRewriteLis[x]);                      // textContentではなくてliオブジェクトをそのまま渡している
+        //   memory.li_lists.push(saveAndRewriteLis[x]);         // ということを確認するためのconsole.log
+        // }
+        // console.log("<<make sure it's get accesse>>");
+        // for(let x = 0; x < memory.li_lists.length; x++){
+        //   console.log(memory.li_lists[x].textContent);
+        // }
+        // const saveandrewrite_key = "honey";
+        // localStorage.setItem(saveandrewrite_key, JSON.stringify(memory));
+        // console.log("Memory :");
+        // console.log(memory);
+        // function empty(node){
+        //   while(node.lastChild){
+        //     node.removeChild(node.lastChild);
+        //   }
+        // }
+        // const divnode = document.getElementById('save-and-rewrite');
+        // empty(divnode);
+        // const loadedMemory = JSON.parse(localStorage.getItem(saveandrewrite_key));
+        // console.log(loadedMemory);
+        // for(let z = 0; z < loadedMemory.li_lists.length; z++){
+        //   console.log(loadedMemory.li_lists[z].textContent);
+        //   console.log(loadedMemory.li_lists[z]);
+        // }
+        console.log("***************************************************");
+        // *****************************************************************
+        // >>> どうやら保存できていたと思ってとりだしてみたら肝心の部分が取り出せなかったでござるの巻き<<<
+        // *****************************************************************
+        console.log("***************************************************");
+        console.log(" CASE: json localStorage usual-object ");
+        // 結論：うまくいく
+        const datas = {
+          data1: "apple", 
+          data2: "grape",
+          data3: "pinapple",
+        };
+        console.log('datas');
+        console.log(datas);
+        const datas_key = "datas_key";
+        localStorage.setItem(datas_key, JSON.stringify(datas));
+        const new_datas = JSON.parse(localStorage.getItem(datas_key));
+        console.log('new_datas');
+        console.log(new_datas);
+        
+        console.log("***************************************************");
+        console.log("***************************************************");
+        console.log(" CASE: json localStorage object's elements are arrays ");
+        // 結論:うまくいく
+        const arrayDatas = {
+          arr1: [" All I Want", "Can't repeat", "pretty fly", "Million Miles Away"],
+          arr2: ["It's like that", "We belong togther", "I'll be lonving with you long time", "Heartbreak"],
+          arr3: [" aaaa", "bbbbb", "cccc", "dddd"],
+        };
+        console.log('arrayDatas');
+        console.log(arrayDatas);
+        const arrayDatas_key = "arrayDatas_key";
+        localStorage.setItem(arrayDatas_key, JSON.stringify(arrayDatas));
+        const new_arrayDatas = JSON.parse(localStorage.getItem(arrayDatas_key));
+        console.log('new_arrayDatas');
+        console.log(new_arrayDatas);
+        
+        console.log("***************************************************");
+        console.log("***************************************************");
+        console.log("CASE: object includes dictionary");
+        // 結論：うまくいく
+        // object has array, and the elements are dictionary 
+        const dictionaries = {
+          playlists: [
+            {id: 1, tiitle: "Heartbreak(remix)", rate: 5},
+            {id: 2, tiitle: "Takin' Over", rate: 5},
+            {id: 3, tiitle: "Really into you(dj komori remix)", rate: 5},
+            {id: 4, tiitle: "Lose Controll", rate: 5},
+          ],
+          genre:"hiphop n RnB",
+        };
+        console.log('dictionaries');
+        console.log(dictionaries);
+        const dictionaryKey = "ASSHOLE";
+        localStorage.setItem(dictionaryKey, JSON.stringify(dictionaries));
+        const new_dic = JSON.parse(localStorage.getItem(dictionaryKey));
+        console.log('new_dic');
+        console.log(new_dic);
+
+
+        console.log("***************************************************");
+        console.log("***************************************************");
+
+        // 結局いずれのオブジェクトのモデルでもうまくいくことは確認できた
+        // ということで再度同様の処理を位置から作り上げてみよう
+        // ********************************************************************
+        console.log("***************************************************");
+
+        // createElement
+        // createElement(tag);
+        // tagはhtmlタグ名
+        // DOCUMENT.appendChild(element);
+        // ドキュメントオブジェクトにたいしてelementを追加する
+        const h1 = document.createElement('h1');
+        h1.textContent = "addition title";
+        document.querySelector('body').appendChild(h1);
+
+
+        console.log("***************************************************");
+        // ********************************************************************
+        // 手順
+        // html要素を取得する
+        // objectに取得した要素を書き込む
+        // 同objectをlocalStorageへ保存する
+        // html要素を取得したところを消す
+        // localStorageから先ほど保存したオブジェクトを取り出す
+        // 消したhtml要素部分をまったく同じに復元する
+
+        // div id="save-and-rewrite"タグ内のulタグ要素を取得する
+        // divElementsが受け取るのはHTMLElementオブジェクトである
+        // 
+        const divElements = document.querySelector('div#save-and-rewrite ul');
+
+        // ちゃんと取得できているか確認
+        console.log("divElements object content");
+        console.log(divElements);
+        console.log(divElements.innerHTML);
+        console.log(divElements.children[0].textContent);
+        console.log(divElements.children[1].textContent);
+        console.log(divElements.children[2].textContent);
+        // console.log(divElements.children[3].textContent);
+        
+
+        // 配列に要素のtextContentを保存する
+        const data4 = {strings:[],};
+        for(let i = 0; i < divElements.children.length; i++){
+          console.log(divElements.children[i]);
+          console.log(divElements.children[i].textContent);
+          data4.strings.push(divElements.children[i].textContent);
+        }
+
+        console.log(data4);
+        console.log(data4.strings);
+
+        const asshole = 'YOUASSHOLE';
+        localStorage.setItem(asshole, JSON.stringify(data4));
+
+        function Empty(node){
+          while(node.lastChild){
+            node.removeChild(node.lastChild);
+          }
+        }
+        const divNodeSave_ = document.querySelector('div#save-and-rewrite ul');
+        Empty(divNodeSave_);
+
+        const rewriteObject = JSON.parse(localStorage.getItem(asshole));
+        console.log(rewriteObject);
+        console.log(rewriteObject.strings[0]);
+        // write textContent
+        
+
+
+        
+
+
+        
+        
+
+
+    }
+  </script>
+</body>
+</html>

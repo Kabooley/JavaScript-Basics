@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .draggable-list {
+            list-style-type: none;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+
+        .draggable-list li {
+            background-color: rgb(116, 116, 204);
+            color: white;
+            border: 2px solid blueviolet;
+            display: flex;
+            flex: 1;
+            width: 200px;
+            margin: 5px auto;
+        }
+
+        .drop-able-list {
+            list-style-type: none;
+            display: block;
+        }
+
+        .drop-possible {
+            background-color: violet;
+            border: 1px solid purple;
+            margin: 5px auto;
+            width: 200px;
+            align-items: center;
+
+        }
+    </style>
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Drag and Drop API</h1>
+
+    <!-- draggable要素 scriptでdatatransferする -->
+    <ul class="draggable-list">
+        <li class="draggables">
+            <div id="draggable-1" draggable="true">DRAG ME! 1</div>
+        </li>
+        <li class="draggables">
+            <div id="draggable-2" draggable="true">DRAG ME! 2</div>
+        </li>
+        <li class="draggables">
+            <div id="draggable-3" draggable="true">DRAG ME! 3</div>
+        </li>
+    </ul>
+
+    <ul class="drop-able-list">
+        <li>
+            <div class="drop-possible" id="drop-possible-1">DROP ZONE</div>
+        </li>
+        <li>
+            <div class="drop-possible" id="drop-possible-2">DROP ZONE</div>
+        </li>
+        <li>
+            <div class="drop-possible" id="drop-possible-3">DROP ZONE</div>
+        </li>
+        <li>
+            <div class="drop-possible" id="drop-possible-4">DROP ZONE</div>
+        </li>
+        <li>
+            <div class="drop-possible" id="drop-possible-5">DROP ZONE</div>
+        </li>
+    </ul>
+    <script>
+        'use strict';
+
+        /******************************************************
+        <<source>>
+        個々の説明がまとまっていてよい
+        https://developer.mozilla.org/ja/docs/DragDrop/Drag_Operations#drop
+
+
+        <<Eventの簡易な説明>>：
+        dragできる要素がドラッグされる
+        ー＞ondragstart
+
+        dragできる要素の操作を開始したとき
+        ー＞ondragstart
+
+        dragできる要素が移動することでdrop可能ゾーンに入った時
+        ー＞ondragenter
+
+        ドラグしている要素が妥当なdrop可能ゾーンの上にいるとき,数ミリ秒ごとに発生する
+        ー＞ondragover
+
+        ドラグしている要素が妥当なdrop可能ゾーンから離れたとき
+        ー＞ondragleave
+
+        ドラグ要素が有効なドロップ対象にdropされた場合に発生
+        ー＞ondrop
+
+
+        <<ドラッグの準備>>
+        条件
+            ・dragしたい要素にdraggable=trueをつける
+            ・dragstartイベントリスナを設けてリスナーの中でドラッグデータを設定する
+            ・上記で定義されたリスナの中でdataTransferにデータを登録する
+        つまりこう
+            // html
+            <p id="draggable" draggable=true >drag me!</p>
+            // script
+            document.addEventListener('dragstart', (event) => {
+                event.target.dataTransfer.setData("text/plain", null);});
+            
+            <<drag操作の開始>>
+            実際にdraggable=trueとなっている要素をdragしたら？
+            "dragstart"イベントが発行される
+
+        <<drop先の指定>>
+        dropされる予定の要素へevent.preventDefault()を追加すればその要素へドロップ可能になる
+
+        通常のウェブページの動作として、ドロップは多くのウェブページのほとんどの領域で禁止されている
+        なのでドロップ可能にしたい領域には、preventDefault()を追加する必要がある
+        つまり
+        ドロップ可能領域でdragenterまたはdragoverしたときはeventに対してpreventDefault()する必要がある
+
+
+            <<スタイリング>>
+            drop可能な要素の上をdragしているアイテムがホバーしているときにdrop可能エリアに効果を付けたい
+
+
+                <<よくわからん点>>
+                ・ondropリスナやondrargoverなどのイベントリスナをつける要素は、
+                ドラッグされる要素の方なのか、ドロップされる要素の方なのか？混乱する
+
+
+        ********************************************************/
+
+        {
+
+            const onDragStart = (event) => {
+                console.log('drag start', event);
+                event.dataTransfer.setData('text/plain', event.value);
+            }
+
+            const onDragEnd = (event) => {
+                console.log('drag end');
+                event.dataTransfer.clearData('text/plain');
+            }
+
+            const onDragEnter = (event) => {
+
+            }
+
+            const onDragOver = (event) => {
+                event.preventDefault();
+                console.log('DROP OVER');
+            }
+
+            const onDragLeave = (event) => {
+
+            }
+
+            const onDrop = (event) => {
+                // drop禁止のデフォルト動作を避けることでdrop可能エリアであることにできる
+                event.preventDefault();
+                console.log('DROP!');
+            }
+
+
+            const addEventListeners = () => {
+
+                // querySelectorAll() returns NodeList behaves like Array
+                const draggable_lists = document.querySelectorAll(".draggables");
+                const drop_possible = document.querySelectorAll(".drop-possible");
+
+                // dragされる要素
+                draggable_lists.forEach(list => {
+                    list.addEventListener('dragstart', onDragStart);
+                    list.addEventListener('dragend', onDragEnd);
+                    list.addEventListener('dragenter', onDragEnter);
+                    // list.addEventListener('dragover', onDragOver);
+                    // list.addEventListener('drop', onDrop);
+
+                });
+
+                // dropされる要素
+                drop_possible.forEach(list => {
+                    list.addEventListener('dragover', onDragOver);
+                    list.addEventListener('drop', onDrop);
+                });
+            }
+
+            addEventListeners();
+
+        }
+    </script>
+</body>
+
+</html>

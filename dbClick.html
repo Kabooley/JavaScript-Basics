@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        aside {
+            background: #fe9;
+            border-radius: 1em;
+            display: inline-block;
+            padding: 1em;
+            transform: scale(.9);
+            transform-origin: 0 0;
+            transition: transform .6s;
+        }
+
+        .large {
+            transform: scale(1.3);
+        }
+
+        #eip2{
+            background: rgb(236, 137, 236);
+            border-radius: 1em;
+            display: inline-block;
+            padding: 1em;
+            margin: auto 1px;
+            transform: scale(0.9);
+        }
+
+        #eip2 p {
+            background:rgb(218, 170, 218);
+            border-radius: 1em;
+            display: inline-block;
+            padding: 1em;
+            transform: scale(1.3);
+        }
+
+    </style>
+</head>
+<body>
+    <aside>
+        <h3>My Card</h3>
+        <p>Double click to resize this object.</p>
+      </aside>
+
+      <div id="editInPlace">
+          <p>click to edit!</p>
+      </div>
+
+
+      <div id="eip2">
+          <h3>Double click to edit paragraph</h3>
+          <p>dblclick</p>
+      </div>
+
+    <script>
+        // MDN dbclickの例
+        // 
+        {
+            const card = document.querySelector('aside');
+            card.addEventListener('dblclick', function (e) {
+            card.classList.toggle('large');
+            });
+        }
+
+        // MDNの例を参考に、クリックしたらinput textフォームに変更される仕様にする
+        {
+            const mount = () => {
+                const h3 = document.querySelector('div#eip2 h3');
+
+            }
+
+            const empty = (node) => {
+
+                console.log('empty()');
+
+                while(node.lastChild){
+                    node.removeChild(node.lastChild);
+                }
+            }
+
+            const signal = (action, object) => {
+                return function callback () {
+                    update(action, object);
+                }
+             }
+
+             const update = (action, obj) => {
+
+                console.log('update()');
+
+                switch(action) {
+                    case 'SAVE&TRANS' :
+
+                        console.log('SAVE&TRANSFORM');
+
+                        // SAVE
+                        let oldP = null;
+                        for(let i = 0; i < obj.childNodes.length; i++){
+                            if(obj.childNodes[i].tagName === 'P'){
+                                oldP = obj.childNodes[i];
+                            }
+                        }
+
+                        // TRANSFORM
+                        const input = document.createElement('input');
+                        input.setAttribute("type", "text");
+                        input.setAttribute("id", "eip2_input");
+                        input.setAttribute("vale", oldP.innerText);
+                        empty(obj);
+                        obj.appendChild(input);
+                    break;
+
+                    case 'REPLACE' : 
+
+                        console.log('REPLACE');
+
+                        // get text typed
+                        const typedText = document.getElementById('eip2_input').value;
+                        if(typedText.length === 0) {
+                            typedText = 'replace';
+                        }
+
+                        const new_paragraph = document.createElement('p');
+                        new_paragraph.setAttribute("value", typedText);
+                        new_paragraph.textContent = typedText;
+                        empty(obj);
+                        obj.appendChild(new_paragraph);
+                    break;
+                }
+             }
+
+
+            // eventlistener for keyup and dblclick
+            // 
+            const subscription = () => {
+
+                console.log('subsciption()');
+
+                const ENTER_KEY = 13;
+
+                // object  monitoring
+                // const mycard = document.quereySelector('aside');
+                // const click2edit = document.getElementById('editInPlace');
+                const replace = document.getElementById('eip2');
+
+
+                replace.addEventListener('dblclick', (e)=> {
+                    signal('SAVE&TRANS', replace)();
+                });
+
+                replace.addEventListener('keyup', (e) => {
+                    if(e.keyCode === ENTER_KEY){
+                        signal('REPLACE', replace)();
+                    }
+                });
+
+            }
+
+            subscription();
+
+        }
+    </script>
+</body>
+</html>
+

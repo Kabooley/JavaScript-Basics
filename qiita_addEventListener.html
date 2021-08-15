@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button class="btn1">click me</button>
+
+    <button class="btn2">set event listener</button>
+    <div class="box">click me</div>
+
+
+
+    <script>
+        'use strict';
+        var button = document.querySelector('.btn1');
+        var set = document.querySelector('.btn2');
+        var box = document.querySelector('.box');
+        var message = 'hola!';
+        var message1 = 'msg1';
+        var message2 = 'msg2';
+
+        var greeting = function (msg, event) {
+            console.log(msg);
+            console.log(event);
+        }
+
+        var greetingInCaseHandleEvent = function (event) {
+            console.log(event);
+            console.log(event.currentTarget);
+            console.log(this);
+            console.log(this.msg);
+        }
+
+
+        var greetingInCaseIIFE = function (msg, event) {
+            console.log(event);
+            console.log(msg);
+        }
+
+
+        // pass argument to callback of addEventListener 
+
+        /**************************************
+        .bind
+        ***************************************/
+        // button.addEventListener('click',
+        //     greeting.bind(null,
+        //         message,
+        //         // message1,
+        //         // message2
+        //     )
+        // );
+
+
+        /**************************************
+        object includes handleEvent
+        ***************************************/
+        // button.addEventListener('click',
+        //     {
+        //         handleEvent: greetingInCaseHandleEvent,
+        //         msg: message
+        //     }, false);
+
+
+        /****************************************
+            IIFE
+        ****************************************/
+        button.addEventListener('click',
+            (function () {
+                return function callback(event) {
+                    greetingInCaseIIFE(message, event);
+                }
+            })(),
+            false);
+
+
+        // remove eventlistener in each case
+        // 
+        // click set button to set event listener to box
+        // click reset button to remove event listener from box
+        // callback must get arguments
+
+
+        // callback 
+        var handler = function (message, event) {
+            console.log('box has clicked');
+            console.log(message);
+            console.log(event);
+            box.removeEventListener('click', handler, false);
+        }
+
+        var handlerIncaseHandleEvent = function (event) {
+            console.log('box has clicked');
+            console.log(this.msg);
+            console.log(event);
+            box.removeEventListener('click', this, false);
+        }
+
+
+        // usual case
+        // set.addEventListener('click', function (event) {
+        //     console.log('set event listener');
+        //     box.addEventListener('click', handler, false);
+        // });
+
+        // callback.bind case
+        // set.addEventListener('click', function (event) {
+        //     console.log('set event listener');
+        //     var message = 'callback.bind(arguments)';
+
+        //     box.addEventListener('click', handler.bind(null, message), false);
+        // });
+
+
+        // IIFE case
+        // set.addEventListener('click', function () {
+        //     var message = 'HOLA!';
+        //     box.addEventListener('click', (function () {
+        //         // `event` argument must set here.
+        //         return function callback(event) {
+        //             handler(message, event);
+        //             box.removeEventListener('click', callback, false);
+        //         }
+        //     })(), false);
+        // });
+
+
+        // Object case
+        set.addEventListener('click', function () {
+            var message = "HOLA!";
+            box.addEventListener('click', {
+                handleEvent: handlerIncaseHandleEvent,
+                msg: message,
+            }, false);
+        });
+
+
+    </script>
+</body>
+
+</html>

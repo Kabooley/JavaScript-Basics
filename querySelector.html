@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <ul class="todo-list">
+        <li data-id="1111aa1111">
+            <div class="view">
+                <input class="toggle" type="checkbox">
+                <label>todo[].title</label>
+                <button class="destory"></button>
+            </div>
+        </li>
+        <li data-id="222222bb2222">
+            <div class="view">
+                <input class="toggle" type="checkbox">
+                <label>then you keep me waiting</label>
+                <button class="destory"></button>
+            </div>
+        </li>
+        <li data-id="33333cc33333">
+            <div class="view">
+                <input class="toggle" type="checkbox">
+                <label>Say it's comlicated</label>
+                <button class="destory"></button>
+            </div>
+        </li>
+        <li data-id="44444dd44444">
+            <div class="view">
+                <input class="toggle" type="checkbox">
+                <label>Maybe I said too much</label>
+                <button class="destory"></button>
+            </div>
+        </li>
+        <li data-id="555555ee5555">
+            <div class="view">
+                <input class="toggle" type="checkbox">
+                <label>Do you wish all in this</label>
+                <button class="destory"></button>
+            </div>
+        </li>
+    </ul>
+    <script>
+        'use sctirct';
+
+        var setListener = function () {
+            var lists, dataset;
+
+            lists = document.querySelector('.todo-list');
+            dataset = Object.keys(lists.children).map(function (index) {
+                return lists.children[index].dataset.id;
+            });
+
+            console.log(dataset);
+
+            dataset.forEach(function (uid) {
+                var identifier = 'li [data-id="' + uid + '"]';
+                console.log(identifier);
+                var li = lists.querySelector(identifier);
+                console.log(li);        // null
+
+
+                // [data-id="uid"]で取得できるb
+                var iddd = '[data-id="' + uid + '"]'
+                var li1 = lists.querySelector(iddd);
+                console.log(li1);
+            });
+        }
+
+        setListener();
+    </script>
+
+</body>
+
+</html>

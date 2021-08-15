@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Learn innerHTML</title>
+</head>
+<body>
+  <h1>Learn about innerHTML</h1>
+  <div id="react">
+    <ul>
+      <li>redman</li>
+      <li>redman</li>
+      <li>redman</li>
+      <li>redman</li>
+    </ul>
+  </div>
+
+  <div id="inputtext">
+    <input type="text" name="hola">
+  </div>
+
+  <h2>*****************************************</h2>
+  <div id="todo-app">
+    <p>type todo tasks</p>
+    <input type="text" name="todo-form" placeholder="add task here...">
+
+    <div id="todo-lists">
+      <ul>
+
+      </ul>
+    </div>
+  </div>
+  <h2>*****************************************</h2>
+
+  <script>
+    // innerHTML
+    // RULE 1:
+    // innerHTMLで扱うオブジェクトが読み込まれていないとinnerHTMLの使用はエラーになる
+    // 
+    //  ただし、onloadの発火機能が２つ以上ある場合、多分後に書いている方が優先される
+    var gReact = null;
+    window.onload = function() {
+      var react = document.getElementById('react');
+      console.log('Got react.innerHTML after window.onload');
+      console.log(react.innerHTML);
+
+
+      gReact = react;
+      changeReact();
+
+      // subScription();
+    }
+
+    // RULE 2:
+    // innerHTMLを変更するなら、代入する""内に改行を含まてはならない
+    function changeReact(){
+      console.log("called: changedReact()");
+      gReact.innerHTML = "<ul><li>methodman</li></ul>";
+    }
+
+    // input type textの内容を取得する
+    function subScription(){
+      // enter-keyが押されたら取得する...にしたい
+      // できた^^
+      const ENTER_KEY = 13;
+      document.addEventListener('keyup', function keyHandler(e){
+        if(e.keyCode === ENTER_KEY){
+          console.log('getTypeText().value');
+          console.log(getTypeText().value);
+        }
+      });
+    }
+
+    // inputフォームオブジェクトを返す
+    function getTypeText(){
+      return document.querySelector("div#inputtext input[name='hola']");
+    }
+
+    // 脱線だけど応用
+    // inputへ入力するたびに入力された内容がinput入力フォームの下にリストされていく機能の実装
+    //
+    {
+      // enterkeyのキーコード
+      const ENTER_KEY = 13;
+      // キーが押下されたら
+      document.addEvenetListener('keyup', function keyMonitor(e){
+        // もしエンタキーだったなら
+        if(e.keyCode === ENTER_KEY){
+          // inputフォームに入力されたテキストを取得する
+          var txt = getTypedText();
+
+
+        }
+      });
+
+      // input[]フォームオブジェクトを返す
+      function getTypedText() {
+        return document.querySelector("div#todo-app input[name='todo-form']");
+      }
+
+    // inputフォームに入力されたテキストは下記のオブジェクトのlistsへ連想配列として保存されていく
+    var task_lists = {
+      lists : [
+        // EXAMPLES
+        // { id: 1, title: "cleam my room ", done: false},
+        // { id: 2, title: "go secure foods ", done: false},
+        // { id: 3, title: "have beef-stew ", done: false},
+      ],
+    };
+    // 取得したテキストをオブジェクトへ保存する
+    function saveTextsToList(obj){
+      var txt = obj.value;
+      // オブジェクト{キー:配列[{連想配列}]}へのアクセス方法ってなんだったっけ？
+      // 確認
+    }
+
+    }
+
+  </script>
+</body>
+</html>
+
+<!-- 
+memomemo
+
+input 入力されたテキストを取得するには.valueを指定する
+document.querySelector("div#inputtext input[name='hola']").value;
+
+
+Enterキーを押したら何か起こるにしたい場合
+この場合は何かDOMオブジェクトを作っておく必要はなく、
+次のようにすればよい
+document.addEventListener('keyup', function keyHandler(e){
+  if(e.keyCode === 13){
+    // add process
+  }
+});
+ただし、enterキーを押したら必ず発火する機能なので、
+もっと状況を限定したい場合はその処理を追加すること
+
+
+
+
+ -->

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ref. LOOPS</title>
+</head>
+<body>
+    <h1>about Loop methods</h1>
+
+    <script>
+        
+
+        // BASICS  : Object.keys(), Array.prototype.filter()
+        {
+            // Object.keys() メソッドは、指定されたオブジェクトが持つプロパティの >>>>名前の配列<<<<を、
+            // 通常のループで取得するのと同じ順序で返します
+            const person = {
+                name : 'future',
+                age : 30,
+                country : 'USA'
+            };
+            const [new_name, new_age, new_country] = Object.keys(person);
+            console.log(new_name + new_age + new_country);          // personオブジェクトのキーだけ取り出せる
+
+
+            // filter() メソッドは、引数として与えられたテスト関数を各配列要素に対して実行し、
+            // それに合格したすべての配列要素からなる新しい配列を生成します。
+            // filter() は、与えられた callback 関数を配列の各要素に対して一度ずつ呼び出し、
+            // callback が true と評価される値を返したすべての要素からなる新しい配列を生成します。
+            // SYNTAX : var newArray = arr.filter(callback(element[, index[, array]])[, thisArg])
+            const fruits = {
+                'apple' : 5,
+                'orange' : 6,
+                'grape' : 5,
+                'strawberry' :  9
+            }
+
+            // 値が5を超えるやつだけtrue
+            // filter()は要素を取得してcallbackへ渡す
+            // const new_fruits = fruits.filter((value)=>{return value > 5;});          fruitsは配列ではなくてオブジェクトだからエラーになる
+            //  -> オブジェクトを配列にする必要がある
+            // Object.keys(fruits)でfruitsのキー値が返される
+            // .fliter()はkeyを一つずつ受け取ってコールバックへ引数として渡す
+            const new_fruits = Object.keys(fruits).filter((key)=>{
+                console.log(`key : ${key}`);
+                return fruits[key] > 5;
+            });
+            console.log(new_fruits);        // expected : 6, 9
+
+        }   
+
+
+    </script>
+</body>
+</html>
+
+<!-- 
+    
+        <概要>
+        objectやarrayのループ処理はいったいどれを使えばいいのか？
+        やってみた
+
+        <メソッドs>
+        1
+        forEach() は、与えられた関数 callback を配列に含まれる各要素に対して一度ずつ、昇順で呼び出します。インデックスプロパティが削除されていたり、初期化されていなかったりした場合 (すなわち疎らな配列、以下の例を参照) は呼び出されません。
+
+        2
+        for...in ループは列挙可能プロパティに対してのみ反復されます。Array や Object のようなビルトインのコンストラクタから生成したオブジェクトは、String の indexOf メソッドや Object の toString メソッドといった、Objet.prototype や String.prototype から列挙可能でないプロパティを継承しています。このループは、対象オブジェクト自身とそのオブジェクトがプロトタイプから継承しているすべての列挙可能なプロパティを反復します (プロトタイプチェーンで対象オブジェクトに近いプロパティは、親プロトタイプのプロパティを上書きする)。
+ 
+        3
+        for...of 文は、反復可能オブジェクト、たとえば組込みの String, Array, 配列風オブジェクト (例えば arguments や NodeList), TypedArray, Map, Set, およびユーザー定義の反復可能オブジェクトなどに対して、反復的な処理をするループを作成します。これはオブジェクトのそれぞれの識別可能なプロパティの値に対して、実行される文を表す独自の反復フックを呼び出します。
+
+        <まとめ>
+        for...in : プロパティ名を取り出す/列挙可能なプロパティを全て取り出すので予期しないプロパティを取り出す可能性がある
+        for...of : プロパティの値を取り出す/反復可能なオブジェクト(配列やリストなど)しか扱えない/ES6~
+        forEach() : 配列の各要素に対して繰り返し処理/配列のみに適用可能
+        
+        dataを繰り返し処理する場合、forEach()がよさそう
+
+
+ -->

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regular Expression</title>
+</head>
+<body>
+
+    <p>template list</p>
+    <div class="template-list">
+        <ul class="template-list">
+            <!-- template list will be placed in here -->
+        </ul>
+    </div>
+    
+    <script>
+        'use strict';
+
+            //      <MDN Regular expression 学習>
+
+        {
+            // \d       : 数字にマッチする
+            // ^\d     :   数字以外にマッチする
+            const re = /([^\d*])(\d)([^\w]*)/;
+            function replacer(match, p1, p2, p3, offset, string) {
+                console.log(`match: ${match}`);
+                console.log(`p1: ${p1}`);
+                console.log(`p2: ${p2}`);
+                console.log(`p3: ${p3}`);
+                console.log(`offset: ${offset}`);
+                console.log(`string: ${string}`);
+                return [p1, p2, p3].join(' - ');
+            }
+            const newStr = 'abcd12345#$*%'.replace(re, replacer);
+            console.log('--- MDN SAMPLE ---');
+            console.log(newStr);
+
+        }
+
+
+        console.log('--------------------');
+        console.log('--- make sure REGULAR EXPRESSION ---');
+
+
+            //      <正規表現別マッチ結果>
+
+        // <memo> 
+        // String.prototype.match();
+        // 戻り値　: Arrayを返す。マッチしなかったらnull
+        // gフラグなし　：ターゲット文字列の中の最初のマッチだけ返す
+        {
+            //  /^\d/ :  
+            // ^ : 入力の先頭にマッチする　
+            // つまり　^\d は入力の先頭が数字だったらマッチする
+            const re = /^\d/;
+            const result = 'BB22 is the suite number'.match(re);
+            console.log(`match :${result}`);            // null
+        }
+
+        {
+                    // /[^\d]/
+
+            // <memo>
+            // [^xyz] : 文字集合の否定または補集合である
+            // []で囲われた文字以外にマッチする
+            // つまり      [^\d]は、\d以外の文字で一番先頭であった文字にマッチする
+            const re = /[^\d]/;
+            const result1 = 'A22 is the suite number'.match(re);
+            console.log(`match :${result1}`);        // A
+            const result2 = '22 is the suite number'.match(re);
+            console.log(`match :${result2}`);        // null じゃない　多分空白
+        }
+        {
+                    // /([^\d])/
+
+            // <memo>
+            // (x) : 'x'にマッチして、マッチ内容を記憶する
+            // 「記憶する」とは?
+
+            const re = /([^\d])/;
+            const result = 'A22 is the suite number'.match(re);
+            console.log(result);        // A,A
+
+            const reg = /([^\d])/g;
+            const r = 'A22 is the suite number'.match(reg);
+            console.log(r);             // '22'以外のすべての文字列内の文字(空白含む)
+
+            // *をつけるとgフラグいらず？
+            const reAsterisk = /([^\d*])/;
+            const rrr = 'A22 is the suite number'.match(reAsterisk);
+            console.log(rrr);           // A,A
+
+            // *は場所の問題?
+            const rereAsterisk = /([^\d]*)/;
+            const rrrr = 'A22 is the suite number'.match(rereAsterisk);
+            console.log(rrrr);          //  A,A
+        }
+        {
+            const re1 = /([^\w*])/;
+            const result1 = '<*?+>%&ABCD::]1234&%$#'.match(re1);
+            console.log(result1);       // < : 最初にマッチした文字だけ
+
+            
+            const re2 = /([^\w]*)/;
+            const result2 = '<*?+>%&ABCD::]1234&%$#'.match(re2);
+            console.log(result2);       // <*?+>%&   : 最初にマッチした文字からアンマッチする直前までの文字を塊として取得
+        }
+
+
+
+
+
+            console.log('----------------------------------');
+
+
+        {
+            
+            //  \w : 英数字にマッチする [a-zA-Z0-9]と同じ
+            // label_title.match()で記号のみマッチできる
+            // 次はダメ   
+            // /([^\w]*)/       :   label_title.match()で"<"が2つの配列が返される
+            // /([^\w]*)/g     :   label_title.match()で英数字以外のすべて(空白も含む)が返される
+
+            const label_title = '<label>title</label>';         // この値をhtml特殊文字としてではなくてエスケープ処理して表示したい
+            const template = '<li>{{label}}</li>';             // {{}}で囲われた部分はlabel_titleに置換されるけど、特殊文字をエスケープしたい
+            const re = /([^\w])/g;
+
+            const escapelist = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                '\'': '&#x27;',
+                '`': '&#x60;',
+                '/' : '&#x2f'
+            };
+
+            // escapeさせる関数
+            const htmlescapes = (chr, p1, offset, string) => {
+
+                console.log(`chr : ${chr}`);        // match値
+                console.log(`p1 : ${p1}`);
+                console.log(`offset : ${offset}`);
+                console.log(`string : ${string}`);
+                return escapelist[chr];
+            }
+
+            // 
+            const escaper = (stringToEscape, regexp) => {
+
+                console.log('escaper()');
+                console.log(`stringToEscape : ${stringToEscape}`);
+                console.log(`regexp : ${regexp}`);
+
+                // ここがポイント！！
+                // テクニック！！
+                const new_string = stringToEscape.replace(regexp, htmlescapes);
+
+                console.log(`new_string : ${new_string}`);
+
+                return new_string;
+
+            }
+
+            const result = template.replace('{{label}}', escaper(label_title, re));
+            console.log(`result : ${result}`);
+
+            const ul = document.querySelector('ul.template-list');
+            const div = document.createElement('div');
+            div.innerHTML = result;
+            ul.appendChild(div);
+
+
+            /*******************
+            ポイントの部分の解説 :
+            regexp : /([^\w])/g
+            stringToEscape : label_title
+            const new_string = stringToEscape.replace(regexp, htmlescapes);では
+            replaceはregexpにマッチした一文字ごとに関数を呼び出して、その戻り値でnew_stringを更新している
+
+            *****************/
+
+        }
+
+
+        console.log('----------------------------------');
+        // un-escaper
+        {
+            // label escaped : <div id="label-text"><label>text</label></div>
+            const label = '&lt;div id=&quot;label-text&quot;&gt;&lt;label&gt;text&lt;/label&gt;&lt;/div&gt;';
+            const template = '<li>{{mastuche}}</li>';
+            const re = /&(lt|gt|amp|quot|#x27|#x60|#x2f);/g;
+            const unescapelist = {
+                '&amp;' : '&', 
+                '&lt;' : '<',
+                '&gt;' : '>',
+                '&quot;' : '"',
+                '&#x27;' : '\'',
+                '&#x60;' : '`',
+                '&#x2f' : '/'
+            }
+            const unescaper = (match) => {
+                return unescapelist[match];
+            }
+            const replacer = (regxp, str) => {
+                return str.replace(regxp, unescaper);
+            }
+            const unescaped_template = template.replace('{{mastuche}}', replacer(re, label));
+
+            console.log(`unescaped_template : ${unescaped_template}`);
+
+        }
+
+
+
+
+        console.log('-------------------------------------------');
+
+
+        // 正規表現とreplace(fucntion(){})の組み合わせ
+        //
+        // /([^\w])/g   :   gフラグを付けないと対象の文字列中のマッチするものすべてを抽出してくれない
+        // escaper         : replaceは、第二引数の関数がリターンした値をもとに文字列を作る
+        //                          その文字列は,replaceでマッチした文字だけリターン値を置換する
+        //                             第二引数の関数はなんでも返せて、replaceはそれをすべて受け入れる
+        {
+            const label =  '<div id="label-text"><label>text</label></div>';
+            const template = '<li>{{mastuche}}</li>';
+            const re = /([^\w])/g;
+            const result = label.match(re);
+            const escaper = (match) => {
+                match = '%';
+                return match;
+            }
+            const replacer = (regxp, str) => {
+                return str.replace(re, escaper);
+            }
+            const new_label = template.replace('{{mastuche}}', replacer(re, label));
+            console.log(`new_label : ${new_label}`);
+        }
+
+        {
+            // todomvc - vanillajsのtemplate
+
+            // string && reHasUnescapedHtml.test(string)について
+            // SYNTAX : RegExpObj.test(str)
+            // 文字列と正規表現に一致するものがあったらtrue,なかったらfalse
+            // 
+            // つまりサンプルでは毎度エスケープする前に一致するかどうか検査して無駄な処理を省いている
+            const htmlEscapes = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                '\'': '&#x27;',
+                '`': '&#x60;',
+                '/' : '&#x2f'
+            }
+            
+            const escapedHtmlChar = (chr) => {
+                return htmlEscapes[chr];
+            }
+            const reUnescapedHtml = /[&<>"'`]/g;                                            // '/'は省いている
+            let reHasUnescapedHtml = new RegExp(reUnescapedHtml.source);    // わかる
+            const escape = (string) => {
+                return (string && reHasUnescapedHtml.test(string))                      // 個々の意味は理解しないといけないな～
+                ? string.replace(reUnescapedHtml, escapedHtmlChar)
+                : string;
+            }
+
+            const template = '<section class="main" style="display: none;">'
+                +   '<input id="toggle-all" class="toggle-all" type="checkbox">'
+                +       '<label for="toggle-all">Mark all as complete</label>'
+                +       '<ul class="todo-list"></ul>'
+                +       '</section>';
+            const result = escape(template);
+            console.log(result);
+            console.log(template && reHasUnescapedHtml.test(template));         // true
+            console.log(template.match(reHasUnescapedHtml));
+        }
+
+    </script>
+</body>
+</html>
+
+
+<!-- 
+    正規表現を使うと何がおいしいの？
+
+    -> たとえば入力された内容をそのまま表示するプログラムの場合、
+        入力内容がhtmlの場合正規表現で検査するとhtmlエスケープを施すことができる
+
+    todomvc - vanillajsでいえば入力されたタスクがhtmlの場合
+    htmlとして出力しないように検査できる
+
+    文字エンコード javascript
+
+        文字コードとは
+        機械語を自然言語に変換するための規約である
+        サンプルvanillajsでは <meta charset='utf-8'>である
+        (https://uxmilk.jp/45155) わかりやすい
+        文字コードは16進数で表現され0(0x0000)からスタートして
+        ASCII 最初の128文字
+        各国文字 
+        他
+
+
+        encode.js : jsで文字エンコードのスタンダードのライブラリ
+
+    正規表現 by MDN
+
+        文字列内で文字の組み合わせを照合するために用いられるパターンである
+        正規表現はオブジェクトでもある
+        次のメソッドが使用可能である
+        RegExpのexec, test
+        Stringのmatch, replace, search, split
+
+        正規表現の作成
+
+        let re = /ab+c/;
+        let re = new RegExp('ab+c');
+
+        /abc/という単純なパターン : 'abc'という並びの文字列が対象に含まれているか判定できる
+
+        つまり正規表現とは
+        対象の文字列からこんな感じの文字列を探したいときに
+        「こんな感じの文字列」とはどういうものかを指定するやつである
+
+        エスケープ
+
+        [特殊な文字]と[リテラル]
+        正規表現の特殊文字として登録されている文字がある$とか*とか^とか
+        リテラルとはこれを特殊文字ではなくその通りの文字として扱うことである
+
+        エスケープとは
+        正規表現の特殊文字をリテラルとして検索したい場合に用いられる手法のことである
+
+        例) "/example/"という文字列を検索したい場合
+        スラッシュ文字をリテラルとして認識してもらわないといけない
+        ('/'をリテラルとしてエスケープするという)
+        そのためにはバックスラッシュを特殊文字の前に着ける
+        (バックスラッシュがコメント内だと\になってしまうけどバックスラッシュ使って)
+        const re = /\/example\/;
+        const re = new RexExp("\/example\/");
+
+        括弧を使う
+
+        正規表現パターンの一部を括弧()で囲うことで、
+        マッチした部分文字列を記憶しておくことができる
+        一旦記憶されればその部分文字列を呼び出すことができる
+
+
+
+        String.prototype.replace(pattern, replacement)
+
+            replace()メソッドは、patternにマッチした文字列をreplacementに変換した文字列を返す
+            元の文字列は変換されない
+
+            str.replace(regexp|substr, newSubstr|function)
+                regexp : マッチしたものが見つかった場合、newSubstrまたはfunctionの戻り値と置き換えられる
+
+                >>>>とにかくreplace()の挙動がよくわからん！！！<<<<
+
+    HTMLエスケープ
+        ここみて
+        (http://www.shurey.com/js/labo/character.html)
+        (https://developer.mozilla.org/ja/docs/Glossary/Entity)
+        
+
+
+
+
+ -->

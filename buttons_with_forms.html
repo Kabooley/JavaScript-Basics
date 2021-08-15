@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How double-click works</title>
+</head>
+<body>
+    <div id="eidt-tag">
+        <p>click to edit</p>
+    </div>
+    <script>
+
+        let isClicked = false;
+
+        const paragraph = document.getElementById('edit-tag');
+        paragraph.onclick = function (e) {
+            isClicked = true;
+            
+        }
+    </script>
+</body>
+</html>

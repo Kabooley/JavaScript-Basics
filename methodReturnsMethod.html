@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>make sure how method works which returns method ??</title>
+</head>
+<body>
+    <h1>VanillaJS : 関数を返す関数は何をしているのか???</h1>
+
+    <script>
+
+        const rendering = () => {
+            console.log("rendering");
+        }
+
+        const mount = () => {
+            const render = (sig) => {
+                rendering();
+            }  
+            const signal = () => {
+                render();
+            }
+
+            render(signal);
+        }
+    </script>
+</body>
+</html>

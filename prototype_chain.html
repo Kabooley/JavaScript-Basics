@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROTOTYPECHAIN</title>
+</head>
+<body>
+    <script>
+        /******************************************
+         * 参考(https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain)
+         * 参考(https://qiita.com/howdy39/items/35729490b024ca295d6c)
+         * 
+        */
+
+        {
+            // __proto__  非推奨機能注意
+
+            var obj = {name: "Michael"};
+            console.log(obj);
+            // consoleで...
+            // {name: "Michael"}
+            // __proto__ : object
+            // と出力される
+            // __proto__はｵﾌﾞｼﾞｪｸﾄｦ作ると裏で生成されるﾌﾟﾛﾊﾟﾃｨである
+
+            // >>> ｵﾌﾞｼﾞｪｸﾄ.__proto__ はObject.prototypeと同じ！！！<<<
+            console.log(obj.__proto__ === Object.prototype);    // true;
+
+            // つまり
+            // ｵﾌﾞｼﾞｪｸﾄを生成するとObjectという名前のプロパティが
+            // 勝手に生成したオブジェクトに加えられて、
+            // さらにこのObjectにprototypeが設定されている
+            // var Object = {prototype : {...}}
+
+            // さらに言うとグローバルオブジェクトだぜと
+            console.log(obj.prototype === window.Object.prototype);     // true
+        }
+
+        {
+            // prototype-chainの仕組み
+            //
+            // あるオブジェクトへアクセスを試みるとき...
+            // 1. 指定ｵﾌﾞｼﾞｪｸﾄのﾌﾟﾛﾊﾟﾃｨが存在するか調べる
+            // 2. __proto__も調べる
+            // 3. __proto__.__proto__とﾌﾟﾛﾄﾀｲﾌﾟﾁｪｰﾝの終端(null)に達するまで捜索する
+            // 4. 終端に達しても見つからない場合、undefinedを返す
+
+            var obbb = {name: "Verballa"}; 
+
+            // ふつう
+            console.log(obbb.name);      // Verballa
+
+            // __proto__.__proto__にあるもの
+            console.log(obbb.__proto__.toString);   // 呼出可能
+
+            // prototypeﾁｪｰﾝの終端がnullであることの確認
+            console.log(obbb.__proto__.__proto__ === null); // true
+            console.log(Object.prototype.__proto__);  // null
+
+            // 捜索の流れ 
+            // obbbからインスタンスのﾌﾟﾛﾊﾟﾃｨを捜索
+            // -> なければｲﾝｽﾀﾝｽの__proto__(Object.prototype)を捜索
+            // -> さらになければObject.prototype.__proto__を捜索
+            // -> nullが返されれば捜索終了
+            // undefinedを返す
+        }
+
+
+        {
+            // functionｵﾌﾞｼﾞｪｸﾄの場合
+
+            var func = function(){console.log("Hola");}
+            var func = new Function('console.log("hello")');
+
+            // 関数でもｵﾌﾞｼﾞｪｸﾄと同様にプロトタイプが構成されている
+            console.log((new Object()).__proto__ === Object.prototype);     // true
+            console.log((new Function()).__proto__ === Function.prototype);     // true
+            console.log((new Array()).__proto__ === Array.prototype);   // true
+
+            // Object.prototypeとまったく同じ
+            console.log(func.__proto__.__proto__);
+
+            // なのでtoStringとか呼べちゃう
+            console.log(func.__proto__.toString);   // f toString([native code])
+
+            var ooo = {};
+            console.log(Object.prototype.constructor === Object);   // true
+            console.log(ooo.constructor === Object);    // true
+            console.log(Function.prototype.constructor === Function);   // true
+            console.log(func.constructor === Function); // true
+        }
+
+        /************************************
+         * まとめ
+         * ｵﾌﾞｼﾞｪｸﾄ.__proto__はｵﾌﾞｼﾞｪｸﾄを生成すると自動でobjに追加されるﾌﾟﾛﾊﾟﾃｨである
+         * ｵﾌﾞｼﾞｪｸﾄ.__proto__=== Object.prototyeは同じである
+         * ｵﾌﾞｼﾞｪｸﾄのﾌﾟﾛﾊﾟﾃｨの操作などは次の流れ
+         * ｵﾌﾞｼﾞｪｸﾄ.ﾌﾟﾛﾊﾟﾃｨ? -> ｵﾌﾞｼﾞｪｸﾄ.__proto__ ? 
+         * -> ｵﾌﾞｼﾞｪｸﾄ.__proto__.__proto__
+         * -> nullになるまで捜査を続けてnullに到達したらundefinedを返す
+         * 
+         * 
+         * 
+         * 
+         * >>> 注意 <<<
+         * __proto__は現在非推奨の機能なので使用しないこと
+         * [[pototype]]の変更はしてはならない
+         * 
+         * 代わりにObject.getPropertyOf()などつかってね
+         * とのこと
+        */
+
+
+        // MDN Inheritance & prototype-chain
+        {
+            // 
+        }
+    </script>
+</body>
+</html>

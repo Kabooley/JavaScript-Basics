@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+</head>
+
+<body>
+  <!-- part 1 -->
+  <button class="set">SET</button>
+  <button class="reset">RESET</button>
+
+  <ul class="lists">
+    <li class="list"> - ONE - </li>
+    <li class="list"> - TWO - </li>
+    <li class="list"> - THREE - </li>
+    <li class="list"> - FOUR - </li>
+    <li class="list"> - FIVE - </li>
+  </ul>
+
+  <!-- part 2 -->
+  <div class="box00">
+    box 0
+    <div class="box01">
+      box 1
+      <div class="box02">box 2</div>
+    </div>
+  </div>
+
+  <script>
+    'use strcit';
+
+    /**********************************************************
+    ul.listsのなかの要素をクリックしたら、
+    一度だけ'HOLA'とコンソールに表示するプログラムだよ!
+
+    button.setをクリックしたらul.lists.childrenの各li要素にリスナ関数をセットするよ
+    button.resetをクリックしたら同要素すべてリスナを除去するよ...のつもりだったけど
+    今回に関係ないからコメントアウトしたよ
+    要は、
+    - 動的にイベントリスナをセットして(これはどうでもいいか)、
+    - イベントリスナ関数に引数を渡して、
+    - 一度だけリスナ関数を使用したら自動的にリスナ関数を除去する
+    そんな仕様を、様々なアプローチで実装していき
+    どんな場合にどれを使えばいいのかを手を動かして理解していくよ！
+
+    1. イベントリスナに引数を渡す方法
+    2. 
+
+
+    ***********************************************************/
+
+    // handleEventの場合、引数はevent
+    // thisのスコープがオブジェクトになる
+    // handleEvent以外の場合、関数呼び出し時にセットされて引数群の一番最後にeventがつく
+    var greetingCaseBind = function (param, event) {
+      console.log(event);         // MoueEvent
+      console.log(param);        // 'HOLA!'
+      console.log(this);            // Window
+      console.log(event.target);  // clickされた要素を指していた
+
+      // やはりremoveができない
+      event.target.removeEventListener('click', greetingCaseBind, false);
+    };
+
+
+    // event.currentTargetで「どの要素か？」が解決できる
+    var greetingCaseHandleEventObject = function (event) {
+      console.log(event);
+      console.log(this.msg);
+      // thisでaddEventListenerの第二引数に設定した値をセットすること
+      // なのでgreetingSecondをセットするのではなく、
+      // this つまり　オブジェクトを指定する
+      event.currentTarget.removeEventListener('click', this, false);
+    }
+
+
+    /*****************************
+      SET EVENT LISTENER
+    ******************************/
+    document.querySelector('.set').addEventListener('click', function () {
+      var self = this;
+      var message = 'HOLA!';
+
+      console.log('SET');
+
+      var lists = document.querySelectorAll('.list');
+      Object.keys(lists).forEach(function (index) {
+
+        console.log(lists[index]);
+
+        // -- .bind --
+        // 
+        // Using bind, you should add removeEventListener
+        lists[index].addEventListener('click', greetingCaseBind.bind(null, message), false);
+        lists[index].removeEventListener('click', greetingCaseBind.bind(null, message), false);
+
+
+
+
+        // -- IIFE --
+        //   lists[index].addEventListener('click', (function (msg, e) {
+        //     return function callback() {
+        //       greeting(msg, e);
+        //       lists[index].removeEventListener('click', callback, false);
+        //     };
+        //   })(message, event), false);
+        // });
+
+
+      }, false);
+
+
+      /********************************
+        RESET EVENT LISTENER
+      *********************************/
+      // document.querySelector('.reset').addEventListener('click', function () {
+      //   var self = this;
+
+      //   console.log('RESET');
+
+      //   var lists = document.querySelectorAll('.list');
+      //   Object.keys(lists).forEach(function (index) {
+      //     lists[index].removeEventListener('click', greeting, false);
+      //   });
+
+    }, false);
+
+  </script>
+</body>
+
+</html>
+
+
+<!--
+addEventListenerのコールバック関数に引数を渡す
+&&
+removeEventListenerで解除できる
+を両立する方法の模索
+
+  addEventListenerの問題
+  1. 全く同じイベント、コールバックを同じ要素に対して重複してセットで来てしまう点
+  2. 無名関数をコールバックにしてしまうと、後でremoveEnvetListenerできない(名前で指定できないから)
+  3. コールバック関数に引数を渡すのが難しい
+  4. 難しいながらにコールバック関数に引数を渡すうまい方法をとると、あとでremoveeventListenerで解除できなくなる
+
+  つまりこう。
+
+  動的に生成される要素群に、生成のたびにlistenerをセットしたい(要素群全部につけるとする)
+  ーー＞　生成のたびに生成済の要素に同じリスナが重複されて行ってしまう
+
+  では生成のたびにいったんremoveEventListenerしてから再度つければいいのでは？
+  ーー＞　コールバック関数に引数を渡すためにbindやhandleEventつきオブジェクトを渡したりしたので
+          removeEventListenerで解除できず、重複していってしまう
+
+  詰みである
+
+
+
+  実際に同じ要素にどれくらいリスナが登録されているかの確認方法
+    ブラウザの開発者ツールを開いて
+    ー＞要素ー＞調べたい要素をソースコードから探してクリック
+    ー＞イベントリスナがある
+    ー＞まったく同じリスナでも重複していれば重複している分表示されるので
+    確認できる
+
+
+
+ -->

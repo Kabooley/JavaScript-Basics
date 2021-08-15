@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="youtubeLecture">
+        <h1> Animation Input</h1>
+        <form class="form">
+            <input type="text" name="name" autocomplete="off" required />
+            <label for="name" class="label-name">
+                <span class="content-name">Name</span>
+            </label>
+        </form>
+    </div>
+
+
+    <div class="checkboxStyleLecture">
+        <h1>Animation CheckBox</h1>
+        <input type="checkbox" id="xd" class="xd">
+        <label for="xd" class="xd-label">checkbox</label>
+    </div>
+
+
+
+    <script>
+        'use strict';
+
+        var cb = document.querySelector('input.cb');
+        console.log(cb);
+        cb.addEventListener('click', function () { console.log('click'); });
+    </script>
+</body>
+
+</html>

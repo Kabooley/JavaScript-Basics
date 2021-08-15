@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Regular Expression</title>
+    <style>
+      .print {
+        display: block;
+      }
+
+      .htmlAcceptable {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Regular Expression</h1>
+    <textarea class="htmlAcceptable" rows="10" cols="40"></textarea>
+    <div class="printarea"></div>
+
+    <script>
+      "use strict";
+
+      var textarea = document.querySelector("textarea.htmlAcceptable");
+      var printarea = document.querySelector("div.printarea");
+
+      // 例
+      // 'jojo'という文字列を検索して置き換える
+      var searchJojo = function (string) {
+        // 'jojo'という表現パターンのregecpオブジェクト
+        var re = new RegExp("jojo", "g");
+
+        // 正規表現が文字列内で見つかったら変換する
+        if (re.test(string)) {
+          return string.replace(re, "##JOJO##");
+        }
+        // 見つからなかったらそのまま戻す
+        else {
+          return string;
+        }
+      };
+
+      var isHtmlLiterarlIncluded = function (str) {
+        // htmlになりえる文字だけの正規表現オブジェクトを作成する
+        // またはinnerHTMlで挿入する先でhtmlを壊さない表現であればいいはず
+        // 文字列全体に適用したいのでgフラグをつける
+        //
+        // 正規表現と一致するパターンが見つかった場合はtrueを返す
+        var re = /[\\&<>"'`]/g;
+        var reObject = new RegExp(re.source);
+        console.log(reObject.test(str)); // true
+        return reObject.test(str);
+      };
+
+      // エスケープ処理を施した文字列を返す
+      var escapeHTMLver1 = function (str) {
+        var newstr;
+        newstr = str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;")
+          .replace(/\\/g, "&yen;")
+          .replace(/`/g, "&#x60;");
+
+        console.log(newstr);
+        return newstr;
+      };
+
+      var escapeRegExp = function (str) {
+        // is there some html literal included ?
+        console.log(str && isHtmlLiterarlIncluded(str)); // false
+        return str && isHtmlLiterarlIncluded(str) ? escapeHTMLver1(str) : str;
+      };
+
+      textarea.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+          var print = document.createElement("span");
+          print.setAttribute("class", "print");
+
+          // 通常、これだと入力内容がhtml言語だとhtmlとして処理されてしまう
+          // print.innerHTML = event.target.value;
+
+          // なのでhtmlだった場合escapeするようにする
+          print.innerHTML = escapeRegExp(event.target.value);
+          printarea.appendChild(print);
+          textarea.value = "";
+          textarea.focus();
+        }
+      });
+    </script>
+  </body>
+</html>
+
+<!-- 
+必須知識
+
+特殊文字とは:
+JavaScriptやhtmlで予約されたキーワードなど
+<や>や*や+など
+こいつらはそのままではその機能を発揮する命令であり
+文字として認識させるにはエスケープしないといけない
+そこで必要なのが正規表現を用いたエスケープ処理である
+
+
+エスケープするとは:
+たとえば演算子の*を、その機能（掛け算する）を抜きにして
+一つの文字として使用したい場合、
+それを別の表現にしないといけない
+この別の表現に変換する作業をエスケープするという
+
+
+このファイルはinnerHTMLでhtml要素を生成し
+その要素にinputフォームで入力した文字をtextContentで持たせる
+というプログラムである
+innerHTMLはその値をすべてhtmlの部品として扱うために
+textContentになる文字列がhtml文法だった場合
+元のhtmlが崩壊しクラッシュする危険性がある
+
+そこでinnerHTMLに含める前にhtmlなど特殊文字をエスケープして
+htmlではなく文字として認識させる
+
+その機能にフォーカスするプロジェクトである
+
+
+
+
+内容 
+    regexpオブジェクトの扱いに慣れる
+    htmlエスケープ
+
+
+
+- RegExpオブジェクト
+
+RegExpオブジェクトは正規表現パターンで任意のテキストを検索するために使用する
+正規表現のオブジェクトである
+
+作成方法
+リテラル記法: '正規表現'
+コンストラクタ関数：regexp('正規表現')
+
+
+- RegExp.test()
+
+正規表現と指定された文字列の一致を調べるための検索を実行する
+つまり
+ある文字列パターンを文字列内で見つかるかどうか調べるときに使用する
+見つかったかどうかはboolean値で返す
+
+
+
+- 処理の流れ
+
+予め検索したい正規表現パターンを作成する
+new RegExp(正規表現, オプション)
+
+検査したい文字列に検索したい文字列パターンが含まれるか、RegExp.test()でチェックする
+
+真ならエスケープする
+
+html言語がそのまま出力される！
+
+
+https://pasomaki.com/html-escape/
+
+
+https://s8a.jp/javascript-escape-regexp#%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE%E6%96%87%E5%AD%97%E5%88%97%E3%82%92%E3%82%A8%E3%82%B9%E3%82%B1%E3%83%BC%E3%83%97%E3%81%99%E3%82%8B
+
+
+
+
+ -->

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bind event, target, function with addEventListener</title>
+</head>
+<body>
+    <script>
+
+        {
+            (function(window){
+
+                window.$on = function(target, type, callback){
+                    target.addEventListener(event, callback);
+                };
+
+            })(window);
+        }
+
+        {
+            (function(window){
+
+                function Controller(model, view){
+                    var self = this;
+                    self.model = model;
+                    self.view = view;
+
+                    self.view.binder('addTask', function(){
+                        self.
+                    });
+                }
+
+                Controller.prototype.addItem = function(title){
+                    var self = this;
+                    this.model
+                }
+
+                window.app = window.app || {};
+                window.app.Controller = Controller;
+            })(window);
+        }
+
+
+        {
+            (function(window){
+                
+                function View(){
+                    
+                }
+
+                // event : 
+                // handler : 
+                View.prototype.binder = function(event, handler){
+
+                    var self = this;        // 
+
+                    switch(event) {
+                        case 'new-todo' :
+                            var newtodo = document.querySelector('.new-todo');
+                            $on(newtodo, 'change', function(){
+
+                            });
+                            break;
+                    }
+                }
+
+                window.app = window.app || {};
+                window.app.View = View;
+            })(window);
+        }
+    </script>
+</body>
+</html>

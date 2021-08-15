@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Dictionary Arrays</title>
+</head>
+<body>
+  <h1> This is how array and dictionary works !</h1>
+  <h2>check console !</h2>
+
+    <div id="todo-tasks">
+      <label>todo task one</label>
+    </div>
+  <script>
+    'use strict';
+
+    { // array
+
+      var fruitslist = ['apple', 'grape', 'orange'];
+      console.log(fruitslist);
+      fruitslist.push('strawberry');
+      console.log(fruitslist);
+
+      console.log("usual way to access each elements by forloop");
+      for(let i = 0; i < fruitslist.length; i++){
+        console.log(fruitslist[i]);
+      }
+
+      console.log("using forEach to access each elements");
+      // 構文： array.forEach( function callbackFunction(currentElement, index, array));
+      // callback-functionは自分で作る部分
+      // 呼び出しごとに配列の要素が順番に、valに代入される
+      fruitslist.forEach( val =>{
+        console.log(val);
+      });
+      // インデックスも知りたい場合
+      fruitslist.forEach(function callbackF(currentElement, index){
+        console.log("currentElement:");
+        console.log(currentElement);
+        console.log("index:");
+        console.log(index);
+      });
+      // 
+      // 要はcallback関数の引数の順番が大事！要素なら第一引数、インデックスなら第二引数
+      //
+    }
+
+    console.log('---------------------------------------------------------------');
+
+    { // dictionary 
+      console.log("Dictionary is like this");
+      var dictionaryObject = {name: 'Bruno', age:36, country:'italia'};
+      console.log('dictionaryObject');
+      console.log(dictionaryObject);
+
+      // 要素の追加 2 way
+      console.log("add 'favorite' element into dictionaryObject");
+      dictionaryObject.tall = 189;
+      dictionaryObject['favorite'] = "peperoni";
+      console.log(dictionaryObject);
+
+      // 値を取得
+      console.log('how to get value');
+      console.log('dictionaryObject.name');
+      console.log(dictionaryObject.name);
+      console.log(dictionaryObject['age']);
+      // undefined
+      console.log("Dicntionary[index] do not works");
+      console.log(dictionaryObject[1]);
+
+      // keyを取得する方法
+      // keyが全部取得される
+      console.log("how to get key ?");
+      var keys = Object.keys(dictionaryObject);
+      console.log(keys);
+      // keysはオブジェクトで、配列みたいに扱える
+      console.log(keys[0]);
+      console.log(keys[1]);
+      console.log(keys[2]);
+      console.log(keys[3]);
+      console.log(keys[4]);
+
+      // Object.keys()を利用したforループを安直に考えてみる
+      console.log("-- for loop --");
+      var kys = Object.keys(dictionaryObject);
+      for(var i = 0; i < kys.length; i++){
+        console.log('dictionaryObject');
+        console.log('key:');
+        console.log(kys[i]);
+        console.log('value:');
+        console.log(dictionaryObject[kys[i]]);
+      }
+
+      // 一般的なループによる取得
+      console.log("-- for in loop --");
+      for(var kyy in dictionaryObject){
+        console.log('dictionaryObject');
+        console.log('key:');
+        console.log(kyy);
+        console.log('value:');
+        console.log(dictionaryObject[kyy]);
+      }
+      
+
+      // dictionaryでforEach()
+      // Object.keys(Object)でObjectのキーが取得できますね
+      // forEach()でそれらに順々にアクセスしていきますよ
+      // という意味
+      // arrayの方で書いた通り、
+      // forEach(function callback(currentElement, index, array){})だよ
+      // 今回はObject.keys()で受け取っているので
+      // looperskeyは当然この連想配列のキーである
+      console.log(" -- Object.keys().forEach() -- ");
+      Object.keys(dictionaryObject).forEach(function looper(looperskey){
+        // key
+        console.log(looperskey);
+        // value
+        console.log(dictionaryObject[looperskey]);
+      });
+
+    }// dictionary end
+
+
+
+    //
+    // advance : get data from body and save it into localStorage as JSON data
+    // and get the data and output it on console
+    //
+    {
+
+      // ひな形の作成
+      var todos_list = {todos : []};
+      // localStorageへ保存するときのキー
+      var todo_savekey = "TODOLIST";
+      // save data inot localStorage
+      localStorage.setItem(todo_savekey, JSON.stringify(todos_list));
+      // div ul li labelの中の値を取得する
+      var tag = document.getElementById('todo-tasks');
+      console.log(tag);
+      console.log(tag.value);
+      // 値を取得する方法ってなんだったっけ？
+      // dotinstall でオブジェクトと操作に関することろ、DOMでgetElement関係を学習
+      
+
+
+    }
+
+    console.log('---------------------------------------------------------------');
+
+    // complicated object : including array including dictionary...
+    {
+      console.log('complicated object : including array including dictionary...');
+      var lists = {
+        todo_lists : [
+          {id: 1, title: "crean my room",  done : false},
+        ],
+      };
+
+      console.log('object: lists');
+      console.log(lists);
+
+      // object listsからtodo_listsへアクセスする方法は、
+      // object.keyでおｋ
+      console.log('lists.todo_lists');
+      console.log(lists.todo_lists);
+
+      // object lists::todo_lists : []の要素へアクセスする方法
+
+      // 1 普通の方法
+      // [{...}]なので、
+      // 配列の要素が連想配列
+      console.log('lists.todo_lists[0].id');
+      console.log(lists.todo_lists[0].id);
+
+      console.log('lists.todo_lists[0]');
+      console.log(lists.todo_lists[0]);
+
+      
+      console.log('-------------------------');
+
+      
+
+      // 2 ループでアクセス
+      // oject例)
+      var hogelist = {
+        todo_lists : [
+          {id: 1, title: "crean my room",  done : false},
+          {id: 2, title: "delete my room",  done : false},
+          {id: 3, title: "destroy my room",  done : false},
+        ],
+
+        voodoo_lists : [
+          {id: 4, title: "erick sermon",  done : false},
+          {id: 5, title: "red man",  done : false},
+          {id: 6, title: "method man",  done : false},
+        ],
+      };
+
+      // hogelistの要素数が２
+      // todo_, voodoo_の要素数が３つずつ
+      for(var keys in hogelist){
+        // hogelits[keys] === todo_lists or voodoo_lists
+        console.log(`current hogelists element : ${keys}`);
+        // forEach()でもfor()でもいいけど、配列を扱うだけならfor()で
+        for(var arrIndex in hogelist[keys]){
+          // arrIndex === todo_listsまたはvoodoo_listsの各インデックス つまり 0~2
+          console.log(`current index number : ${arrIndex}`);
+          // hogelist[0][arrIndex] === todo_listsの各要素
+          console.log('hogelist[keys][arrIndex] : ');
+          console.log(hogelist[keys][arrIndex]);
+
+          // hogelist::todo_lists or voodoo_lists::各要素のid, title, doneへアクセスしていく
+          Object.keys(hogelist[keys][arrIndex]).forEach(function accessDictionary(currentElement){
+            console.log('current Dictionarys key:');
+            console.log(currentElement);
+            console.log('and Dictionarys value:');
+            // これはうまくいかないけど
+            console.log(hogelist[keys][arrIndex].currentElement);
+            // これはうまくいく　むかつく
+            console.log(hogelist[keys][arrIndex].id);
+            console.log(hogelist[keys][arrIndex].title);
+            console.log(hogelist[keys][arrIndex].done);
+
+
+          });
+        }
+      }
+
+
+      
+    }
+  </script>
+</body>
+</html>

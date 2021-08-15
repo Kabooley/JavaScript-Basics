@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        {
+            // primitive値は変更不可能である
+            // 厳密にいうと、
+            // 置き換えることはできるけど、直接変更することはできない
+            var bar = "baz";
+            console.log(bar);
+            bar.toUpperCase();
+            console.log(bar);
+
+            var foo = [];
+            console.log(foo);
+            foo.push('plug');
+            console.log(foo);
+
+            // primitiveへprimitive値を代入することで、「置き換わる」ことはできる
+            bar = bar.toUpperCase();
+            console.log(bar);
+
+            var result = true;
+            var booleans = [true, false, true, false, true];
+            var booleanObjs = [
+                { bool: true, },
+                { bool: false, },
+                { bool: true, },
+                { bool: true, },
+                { bool: false, },
+            ];
+
+            for (var i = 0; i < booleans.length; i++) {
+                result = result && booleans[i];
+                console.log(result);
+            }
+            console.log('finally:');
+            console.log(result);        // false
+
+            result = true;
+            console.log(result);
+
+            for (var i = 0; i < booleans.length; i++) {
+                result = result && booleanObjs[i].bool;
+                console.log(result);
+            }
+
+            console.log('finally:');
+            console.log(result);        // fasle
+
+        }
+
+        {
+            // 関数の引数は、実引数のコピーである
+            // なので関数に渡した値に影響しない
+        }
+    </script>
+</body>
+
+</html>
