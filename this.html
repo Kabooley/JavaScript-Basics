@@ -10,19 +10,57 @@
     <script>
       "use strict";
 
+      // --------------------------------------------------------------
+      // グローバル・コンテキスト
       // グローバル・コンテキスト上では厳格モードかどうかにかかわらず、
       // thisはグローバル・オブジェクトを指す
       console.log("this === window: ", this === window); // true
 
       // --------------------------------------------------------------
-      // 関数コンテキスト上では、
+      // 関数コンテキスト
       // thisは呼び出され方によってその値が異なる
       // 実行コンテキストに入るときにthisの値が設定されていないと
-      //   undefinedのままになる
+      // undefinedのままになる
       function f1() {
         return this;
       }
       console.log("f1() === undefined: ", f1() === undefined); // true
+
+      // --------------------------------------------------------------
+      // call()
+      console.log("-- call() ---------------------------------------");
+
+      function Product(name, price) {
+        this.name = name;
+        this.price = price;
+      }
+
+      function Food(name, price) {
+        // ProductをFoodに所属させた
+        Product.call(this, name, price);
+        this.category = "food";
+      }
+
+      // Foodには存在しない`name`だけど、ProductをFoodのプロパティにしたからアクセスできるようになった
+      console.log(new Food("cheese", 5).name); // "cheese"
+      console.log(new Food("cheese", 5));
+
+      // callを使用した、所属のない関数と、メソッドを持たないオブジェクトを組み合わせて呼び出す方法
+      function greet() {
+        const reply = [
+          this.animal,
+          "typically sleep between",
+          this.sleepDuration,
+        ].join(" ");
+        console.log(reply);
+      }
+
+      const obj = {
+        animal: "cats",
+        sleepDuration: "12 and 16 hours",
+      };
+
+      greet.call(obj); // cats typically sleep between 12 and 16 hours
 
       // --------------------------------------------------------------
       // オブジェクトの関数として
@@ -30,6 +68,7 @@
       //
       // 関数コンテキストの中のthisであるが、オブジェクトのメソッドである場合、
       // オブジェクトを指す
+      console.log("-- Object --------------------------------------");
       const jonas = {
         name: "Jonas",
         year: 1989,
@@ -50,7 +89,6 @@
 
       // クラス
       // thisはPersonオブジェクトを指す
-      // thisは関数コンテキストの中では、指定しないとグローバルオブジェクトを指すのではなかったのではないのだろうか？
       //
       var Person = function (name, age) {
         this.name = name;
@@ -63,6 +101,84 @@
 
       var Mike = new Person("Mike", 28);
       console.log(Mike.whoIsThis());
+
+      // ---------------------------------------
+      // OOPでのcallbackのthis
+      // あるインスタンスのメソッドをべつのインスタンスに渡してコールバックとして実行してもらう
+      // そのときにメソッドのthisが自身の所属するインスタンスを指し続けるようにする
+      console.log("-- OOP -------------------------------------");
+
+      var View = function () {};
+
+      var Store = function (db) {
+        this.db = db;
+      };
+
+      Store.prototype.save = function (callback) {
+        var self = this;
+        console.log("[Store] Saved data");
+        callback();
+      };
+
+      var Model = function (store) {
+        this.store = store;
+      };
+
+      //
+      Model.prototype.update = function (callback) {
+        var self = this;
+        console.log("[Model] update data");
+        self.store.save(callback);
+      };
+
+      var Controller = function (view, model) {
+        this.view = view;
+        this.model = model;
+      };
+
+      Controller.prototype.toggle = function () {
+        var self = this;
+        console.log("[Controller] detected toggle");
+
+        // 正しい方法
+        self.model.update(function () {
+          self.setView();
+        });
+
+        // 正しくない方法:
+        // その１
+        // self.model.update(self.setView);
+        // その２
+        // self.model.update(this.setView);
+        // その３
+        // self.model.update(function () {
+        //   console.log(this);
+        //   this.setView();
+        // });
+      };
+
+      Controller.prototype.setView = function () {
+        var self = this;
+        console.log("[Controller] setView");
+        // このthisが何を指すのかって話
+        console.log(this);
+      };
+
+      var App = function () {
+        this.store = new Store("storage-name");
+        this.view = new View();
+        this.model = new Model(this.store);
+        this.controller = new Controller(this.view, this.model);
+      };
+
+      var app = new App();
+      app.controller.toggle();
+
+      // Function.prototype.bind()
+      console.log("-- .bind() -----------------------------------");
+
+      // アロー関数
+      console.log("-- Arrow Function ----------------------------");
     </script>
   </body>
 </html>
@@ -76,12 +192,70 @@ thisは実行コンテキスト生成時に同時に生成される変数の一�
 つまり
 thisはその値が固定ではない
 
+#### 関数コンテキストのthis
+
+呼出し時にthisの値が設定していなければ
+厳格モードでは`undefined`
+厳格モードじゃなければグローバルコンテキストを指す
+
+この「呼出し時にthisの値を設定する」を実現するのは
+call()またはapply()である
+
+
+#### call()
+
+> call() はあるオブジェクトに所属する関数やメソッドを、別なオブジェクトに割り当てて呼び出すことができます。
+
+要はなりすましができる
+これが実現できるのは、thisを操作できるからである
+
+```JavaScript
+    function Product(name, price) {
+    this.name = name;
+    this.price = price;
+    }
+
+    function Food(name, price) {
+    //   ProductをFoodに所属させた
+    Product.call(this, name, price);
+    this.category = "food";
+    }
+```
+Foodが
+`{category: "food"}`から
+`{name: "cheese", price: 5, category: "food"}`と拡張された
+
+つまり
+call()が、ProductのthisがProductを指すのではなくてFoodを指すように命令したのである
+あるオブジェクトを別のオブジェクトの所属のように扱うことができる
+
+使いどころとしては
+別のオブジェクトの変数や関数だけに用がある時に借りるのにちょうどいいかも
+
+call()の第一引数を指定しないとその呼び出しにおいてオブジェクトのthisはグローバルコンテキストを指す
+
+
+
+#### 小まとめ１
+
+関数コンテキストではcall()やapply()やbind()で指定しなければthisはグローバルコンテキストを指す
+call()は、あるオブジェクトに所属している関数やメソッドのthisが、まったく関係ないオブジェクトを指させてそのオブジェクト所属のようになり済ませることができる
+apply()はcall()の配列専用バージョン
+
 
 
 #### オブジェクトのメソッドとして
 - オブジェクトのメソッドとして呼び出されるとき、メソッドのthisはオブジェクトを指す
 - あとから関係ない関数をオブジェクトのメンバとして登録しても、その関数のthisはオブジェクトを指す
 
+関数コンテキストではthisは設定しなければグローバルコンテキストを指すことになる話だったけれど
+オブジェクトのメソッドとなると、そのメソッドはとくに「設定」しなくてもthisはオブジェクトを指す
+
+
+#### 小まとめ２
+
+関数コンテキストは、オブジェクトのメソッドである場合はthisがオブジェクトを指す
+それ以外の関数コンテキストはcall()やapply()やbind()で指定しなければthisはグローバルコンテキストを指す
 
 #### OOPでのthis
 
@@ -89,69 +263,84 @@ thisはその値が固定ではない
 
 アロー関数を使わないES6以前の開発においては以下のように
 各prototypeメソッドのthisを固定するように
-`var self = this;`としていた
+`var self = this;`としている
 
-あるインスタンスがべつのインスタンスのメンバになっているようなとき
-thisをちゃんと管理しないとthisが指すものが意図しないものになりやすい
+Controller.prototype.toggle()で、Controller自身のメンバであるModelインスタンスのメソッドを呼び出した
+Modelインスタンスには、コールバック関数としてController.prototype.setView()を渡す
+Controller.prototype.setView()は呼び出し先の任意の場所でコールバック関数として実行される
+つまり、
+実行環境がControllerのスコープじゃない時に、いかにしてこのメソッドのthisがControllerを指したままにできるのか
+を追及する
 
-例えば以下の場合
+function(){self.メソッド}とfunction(){this.メソッド}とthis.メソッド、self.メソッドの違い
+
+1. `self.setView`または`this.setView`として渡すとき
 
 ```JavaScript
-// toggle()のthisはControllerインスタンスを指す
-// Controllerは
-  Controller.prototype.toggle = function (data) {
-    console.log('[Controller] toggle');
-    var self = this;
-    var completed;
-
-    completed = self.model.search(data.uid).completed;
-    console.log(completed);
-    self.model.update(
-      data.uid,
-      { completed: !completed },
-      // 無名関数で囲んで呼出さないとthisがｸﾞﾛｰﾊﾞﾙｺﾝﾃｷｽﾄをさすことになる
-      function () {
-        self.setView();
-      }
-    );
-  }
-
-
-    Model.prototype.update = function (id, updatedData, callback) {
-        console.log('[Model] update');
+      Controller.prototype.toggle = function () {
         var self = this;
-        callback = callback || function () { };
-        var updatedItem = {
-            id: id,
-        }
+        console.log("[Controller] detected toggle");
 
-        Object.keys(updatedData).forEach(function (key) {
-            if (key === 'title') {
-                updatedItem.title = updatedData.title;
-            }
-            if (key === 'completed') {
-                updatedItem.completed = updatedData.completed;
-            }
+        // 正しくない方法: 
+        self.model.update(self.setView);
+        // または
+        self.model.update(this.setView);
+      };
+```
+結果、コールバックとして実行された先で、setView関数は`console.log(this)`で`undefined`を出力した
+
+呼び出し時`self.model.update(self.setView);`ではselfはしっかりControllerを指している
+しかし、
+setViewのthisはこのときControllerではなくて、グローバルコンテキストを指したこととなっている
+
+なぜか
+理由は無名関数で囲んでいないからである
+
+
+
+2. `function(){this.setView()}`として渡すとき
+
+```JavaScript
+      Controller.prototype.toggle = function () {
+        var self = this;
+        console.log("[Controller] detected toggle");
+
+        self.model.update(function () {
+          this.setView();
         });
+      };
+```
+結果、typeerror: setViewなんて定義されていないんだけどとのこと
+なぜか
+理由は、`function(){this.setView()}`の`this`は関数コンテキストのthisで、設定されていないため
+厳格モード上ではこの場合`undefined`になる
+実際、
+この無名関数の中で`console.log(this)`はundefinedを吐き出す
 
+なのでここでは`this`を使わずに、あらかじめ「除けておいた」`self`を使えば
+スコープが`Controller`を指してくれる
 
-        self.store.write(updatedItem, callback);
-    }
+```JavaScript
+      Controller.prototype.toggle = function () {
+        var self = this;
+        console.log("[Controller] detected toggle");
 
+        self.model.update(function () {
+          // `this`の代わりに`self`を使う
+          self.setView();
+        });
+      };
 ```
 
-Controllerインスタンスのprototype関数setView()を別のインスタンスに渡して実行してもらう
-このとき
-setView()のthisがControllerを指し続けるにはどうすればいいのか
-
-Controller.prototype.toggle()からModel.prototype.update()へ渡すとき
-- 無名関数で囲んで渡す : thisは各インスタンスをただしく指している
-- まんま関数を渡す: (厳格モードではないので)グローバルコンテキストを指す
-
-なぜか？
+これでスコープが異なる先で、setView()がコールバックとして実行される場合でも
+setView()はController.prototype.setView()として実行される
 
 
+#### OOPでのthisの問題の解決方法
 
+1. 無名関数+self
+2. .bind
+3. アロー関数
 
 
  -->
