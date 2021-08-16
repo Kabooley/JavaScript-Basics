@@ -102,6 +102,37 @@
       var Mike = new Person("Mike", 28);
       console.log(Mike.whoIsThis());
 
+      // --------------------------------------------------------------
+      console.log("-- .bind() -----------------------------------");
+      // ｸﾞﾛｰﾊﾞﾙｺﾝﾃｷｽﾄのxと、オブジェクトプロパティのｘどちらを呼出すのかで
+      // 関数のthisが何を指すのか判断する
+      //
+      // module.getX()はmodule.xを返す。オブジェクトメソッドのthisは所属するオブジェクトを指すからである
+      //
+      // retrieveは関数コンテキストである
+      // とくにthisを設定していないのでｸﾞﾛｰﾊﾞﾙｺﾝﾃｷｽﾄを指す
+      //
+      // ほぼ同様に呼び出されるboundGetXは、やはりｸﾞﾛｰﾊﾞﾙｺﾝﾃｷｽﾄを指すはずだが、
+      // .bind()でmoduleをバインドしているので
+      // このmoduleとは関係ない関数コンテキストはmoduleを指す
+      {
+        this.x = 9;
+        const module = {
+          x: 81,
+          getX: function () {
+            return this.x;
+          },
+        };
+
+        console.log(module.getX()); // 81
+
+        const retrieveX = module.getX;
+        // console.log(retrieveX()); // 9 厳格モードでundefined.
+
+        const boundGetX = retrieveX.bind(module);
+        console.log(boundGetX()); // 81
+      }
+
       // ---------------------------------------
       // OOPでのcallbackのthis
       // あるインスタンスのメソッドをべつのインスタンスに渡してコールバックとして実行してもらう
@@ -141,9 +172,14 @@
         console.log("[Controller] detected toggle");
 
         // 正しい方法
-        self.model.update(function () {
-          self.setView();
-        });
+        // その１
+        // self.model.update(function () {
+        //   self.setView();
+        // });
+        // その２
+        self.model.update(self.setView.bind(self));
+        // self.model.update(self.setView.bind(this));
+        // self.model.update(this.setView.bind(this));
 
         // 正しくない方法:
         // その１
@@ -155,6 +191,8 @@
         //   console.log(this);
         //   this.setView();
         // });
+        // その４
+        // self.model.update(self.setView.call(self));
       };
 
       Controller.prototype.setView = function () {
@@ -174,11 +212,24 @@
       var app = new App();
       app.controller.toggle();
 
-      // Function.prototype.bind()
-      console.log("-- .bind() -----------------------------------");
-
       // アロー関数
       console.log("-- Arrow Function ----------------------------");
+      // アロー関数は、そのthisは関数が生成されたときの値が設定される!!
+      var globalObject = this;
+      var foo = () => this;
+      // アロー関数のthisはグローバルコンテキストを指す
+      console.log(foo() === globalObject); // true
+
+      // fooが通常の関数であればオブジェクトのメソッドなのでobjを指すはずだが...
+      var obj = { func: foo };
+      console.log(obj.func() === globalObject); // true
+
+      // call を使用して this の設定を試みても...
+      console.log(foo.call(obj) === globalObject); // true
+
+      // bind を使用して this の設定を試みても...
+      foo = foo.bind(obj);
+      console.log(foo() === globalObject); // true
     </script>
   </body>
 </html>
@@ -257,7 +308,54 @@ apply()はcall()の配列専用バージョン
 関数コンテキストは、オブジェクトのメソッドである場合はthisがオブジェクトを指す
 それ以外の関数コンテキストはcall()やapply()やbind()で指定しなければthisはグローバルコンテキストを指す
 
-#### OOPでのthis
+
+#### Function.prototype.bind()
+
+> bind() 関数は、新しいバインドされた関数、すなわち元の関数オブジェクトをラップする特殊関数オブジェクトexotic function object (ECMAScript 2015 からの用語) を生成します。
+> バインドされた関数を呼び出すと、通常はラップされた関数が実行される結果になります。
+
+ということで.bind()で返される関数は元の関数に似た何かを生成する
+
+.bind()の使いどころは、
+**呼び出され方に関係なく特定の`this`をもつ関数を生成すること**
+
+例として
+```JavaScript
+
+      Controller.prototype.toggle = function () {
+        var self = this;
+        console.log("[Controller] detected toggle");
+
+        // 正しい方法
+        // その１
+        // self.model.update(function () {
+        //   self.setView();
+        // });
+        // その２
+        self.model.update(self.setView.bind(self));
+      };
+
+```
+上記の呼び出し方法ならば、
+self.setView()は呼出先でコールバックとして実行されるときに
+自身のコンテキストをControllerに固定することができる
+
+
+#### .call()と.bind()の違い
+
+.cal()は関数に対してそのコンテキストを引数のコンテキストにして、即座に呼び出す
+.bind()はあらたなラッパーオブジェクトを生成してそいつのthisを引数のコンテキストにすることである
+
+
+#### 小まとめ３
+
+- 関数コンテキストは、呼出時に.call(), .apply(), .bind()などでthis値を設定しなければグローバルコンテキストを指す
+- オブジェクトのメソッドのthisは、その所属するオブジェクトを指す
+- .call()と.bind()の違いは、前者は関数に対してつけるものでその関数のthis値を別物にすることでまるで別物の関数のように振る舞わせて即座に呼び出すことである
+後者も関数を対象にするが、即座に呼び出さない。また.bindはあらたな特殊関数オブジェクトを生成する。
+
+
+#### OOPでのthis (コールバックのthis)
 
 **ES6以前のVanillaJSでの話**
 
@@ -341,6 +439,21 @@ setView()はController.prototype.setView()として実行される
 1. 無名関数+self
 2. .bind
 3. アロー関数
+
+
+#### アロー関数
+
+> アロー関数では、this はそれを囲むレキシカルコンテキストの this の値が設定されます。
+> グローバルコードでは、グローバルオブジェクトが設定されます。
+
+> アロー関数の呼び出し時に this 引数が call, bind, apply に渡されても無視されます。
+> 呼び出しに引数を加えることはできますが、最初の引数 (thisArg) は null を設定してください
+
+
+**アロー関数は、そのthisは関数が生成されたときの値が設定される**
+アロー関数のthis値は、
+その関数が生成されたときの、
+それを囲むレキシカルコンテキストのthisが設定される
 
 
  -->
