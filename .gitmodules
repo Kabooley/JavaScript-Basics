@@ -1,0 +1,3 @@
+[submodule "JavaScript-Complete-Course"]
+	path = JavaScript-Complete-Course
+	url = git@github.com:Kabooley/JavaScript-Complete-Course.git
