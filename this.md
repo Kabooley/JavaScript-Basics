@@ -17,6 +17,10 @@ https://dmitripavlutin.com/gentle-explanation-of-this-in-javascript/
 
 > ほとんどの場合、this の値はどのように関数が呼ばれたかによって決定されます (実行時結合)。これは実行時に代入によって設定することはできず、関数が呼び出されるたびに異なる可能性があります。ES5 では bind() メソッドが導入され、関数がどのように呼ばれたかに関係なく `this` の値を設定するすることができるようになり、ES2015 では、自身では this の結び付けを行わないアロー関数が導入されました (これは包含する構文上のコンテキストの this の値を保持します)。
 
+要はいろんな場面でthisが指すものは異なり、
+
+具体的にはコンテキストと呼び出され方によって異なる。
+
 #### strict モードでないとき
 
 グローバルコンテキスト：グローバル・オブジェクトを指す。
@@ -58,7 +62,22 @@ hoge();
     hoge();
 ```
 
-#### call()
+#### 関数コンテキスト
+
+呼び出され方によって異なる。
+
+- 関数内部がstrictモードでないとき：グローバルオブジェクトを指す
+- 関数内部がstrictモーでのとき；undefinedとなる
+
+関数呼び出し時にthisを指定する方法がある。
+
+- Funciton.prototype.call()
+- Funciton.prototype.apply()
+- Funciton.prototype.bind()
+
+
+
+#### Function.call()
 
 https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Function/call
 
@@ -76,13 +95,29 @@ https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Fu
 
 自分のものでないものをあたかも自分のもののように呼び出すことができる。
 
-```JavaScript
-Function.prototype.call()
+```TypeScript
 
+interface Function {
+    /**
+     * Calls a method of an object, substituting another object for the current object.
+     * @param thisArg The object to be used as the current object.
+     * @param argArray A list of arguments to be passed to the method.
+     */
+    call(this: Function, thisArg: any, ...argArray: any[]): any;
+}
+// NOTE: 第一引数のthisはFunctionオブジェクトのことで、通常使用する場合無視する
 // 例：
-// 呼び出したいもの.call(呼び出したい側のthis)
-// ある関数.call(その関数のthisとして指定したいオブジェクト)
+// 呼び出したいオブジェクト.call(呼び出したい側のthis)
+// 呼び出したい関数.call(その関数のthisとして指定したいオブジェクト)
 ```
+
+ということで、
+
+呼び出したい関数.call(その関数におけるthisとして指定したいオブジェクト)
+
+.call付きで関数を呼び出すときに、その関数に渡したい引数は
+
+.callの第二引数以降にその引数を渡す。
 
 ```JavaScript
 
@@ -120,8 +155,73 @@ Function.prototype.call()
     greet.call(obj); // cats typically sleep between 12 and 16 hours
 ```
 
+#### Function.apply()
+
+```TypeScript
+interface Function {
+    /**
+     * Calls the function, substituting the specified object for the this value of the function, and the specified array for the arguments of the function.
+     * @param thisArg The object to be used as the this object.
+     * @param argArray A set of arguments to be passed to the function.
+     */
+    apply(this: Function, thisArg: any, argArray?: any): any;
+}
+```
+
+Function.call()との違い:
+
+- call()は連続した引数のリストを受け取るのに対して、apply()は引数の配列を一つだけ受け取れるという点
+
+ということで、Function.call()との違いは、
+
+呼び出したい関数へ渡す引数は配列型の変数一つだけということ。
+
+ではこの配列がどのように呼び出したい関数へ渡されるのか。
+
+1. 配列を別の配列に追加する
+
+```JavaScript
+    let arr = [1, 2, 3];
+    let numbers = [4, 5, 6];
+
+    arr.push.apply(arr, numbers);
+
+    console.log(arr); // 1, 2, 3, 4, 5, 6
+```
+
+通常、配列1.push(配列2)だと、配列2の中身すべてが配列1の一つの要素として末尾に追加される。
+
+そうではなくて配列１のつづきとして配列２の中身を追加したいときに、
+
+上記のようにできる。
+
+NOTE: 既存の配列に追加する。
+
+新規の配列を返してほしいときはconcatを使う。
+
+
+他、いろいろ利用例があるけれどぶっちゃけ覚えるのは大変。
+
+コードレビューするときに仕様と意図を読み取るようにした方がいいかも。
+
+
 #### まとめ
 
 -   **基本的に「関数を呼び出したときに、this を『設定』しないと this はグローバル変数か undefined になる」**
 
 関数の this は関数呼出時に指定すればその通りに、指定しなければ、strict モードでなければグローバルコンテキストの this と同じになり、strict モードなら undefined になる
+
+#### class コンテキスト
+
+コンストラクタ関数含む。
+
+関数コンテキストとの違い...
+
+- classにおけるthisはオブジェクトである
+
+関数ではグローバルオブジェクトかundefinedかcall, apply, bindで指定した対象である
+
+- classのメソッドはthisのプロトタイプに追加される
+
+静的メソッドはthisに追加されない。クラス自身のプロパティとなるからクラスメソッドとして使えないのである。
+

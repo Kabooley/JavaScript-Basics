@@ -40,6 +40,49 @@
             };
 
             greet.call(obj); // cats typically sleep between 12 and 16 hours
+
+            console.log('- apply ---------------------------');
+            let arr = [1, 2, 3];
+            let numbers = [4, 5, 6];
+
+            arr.push.apply(arr, numbers);
+
+            console.log(arr);
+
+            console.log('- class -----------------------------');
+
+            const jonas = {
+                name: 'Jonas',
+                year: 1989,
+                calcAge: function () {
+                    return 2021 - this.year;
+                },
+                whoIsThis: function () {
+                    return this;
+                },
+            };
+
+            console.log(jonas.calcAge()); // 32
+            console.log(jonas.whoIsThis()); // オブジェクトjonasを指した
+
+            // 試しに後出しでf1()をjonasのメソッドとしたらどうなるか
+            jonas.whoIAm = f1;
+            console.log(jonas.whoIAm()); // オブジェクトjonasを指した
+
+            // クラス
+            // thisはPersonオブジェクトを指す
+            //
+            var Person = function (name, age) {
+                this.name = name;
+                this.age = age;
+            };
+
+            Person.prototype.whoIsThis = function () {
+                return this;
+            };
+
+            var Mike = new Person('Mike', 28);
+            console.log(Mike.whoIsThis());
         </script>
     </body>
 </html>
