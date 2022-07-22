@@ -213,6 +213,8 @@ NOTE: 既存の配列に追加する。
 
 #### class コンテキスト
 
+https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/this#%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%B3%E3%83%B3%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88
+
 コンストラクタ関数含む。
 
 関数コンテキストとの違い...
@@ -225,3 +227,105 @@ NOTE: 既存の配列に追加する。
 
 静的メソッドはthisに追加されない。クラス自身のプロパティとなるからクラスメソッドとして使えないのである。
 
+- classメソッドだからと言って、メソッドのthisは常に所属のインスタンスを指すわけではない
+
+基本的にコンストラクタでbindするか、アロー関数で定義すること
+
+```JavaScript
+
+    const jonas = {
+        name: 'Jonas',
+        year: 1989,
+        calcAge: function () {
+            return 2021 - this.year;
+        },
+        whoIsThis: function () {
+            return this;
+        },
+    };
+
+    console.log(jonas.calcAge()); // 32
+    console.log(jonas.whoIsThis()); // オブジェクトjonasを指した
+
+    // 試しに後出しでf1()をjonasのメソッドとしたらどうなるか
+    function f1() {
+        return this;
+    }
+    jonas.whoIAm = f1;
+    console.log(jonas.whoIAm()); // オブジェクトjonasを指した
+
+    // クラス
+    // thisはPersonオブジェクトを指す
+    //
+    var Person = function (name, age) {
+        this.name = name;
+        this.age = age;
+        this.self = this;
+    };
+
+    Person.prototype.whoIsThis = function () {
+        return this;
+    };
+
+    var Mike = new Person('Mike', 28);
+    console.log(Mike.whoIsThis());  // Mikeのインスタンス
+    console.log(Mike.self); // Mikeのインスタンス
+```
+
+#### クラスフィールドでバインドされたメソッドを作成する
+
+クラスメソッドは明示的にthisを指定しないと、thisはメソッドの所属インスタンスを指さない
+
+なので、クラスメソッドは必ずアロー関数で書くか、コンストラクタでbindしろ。
+
+```JavaScript
+class Button {
+  constructor(value) {
+    this.value = value;
+  }
+
+  click() {
+    alert(this.value);
+  }
+}
+
+let button = new Button("hello");
+
+setTimeout(button.click, 1000); // undefined
+```
+
+上記はbutton.clickのthisがsetTimeoutのコンテキストになった。
+
+通常関数のthisは呼出時にthisを指定しないとグローバルかundefinedになる。
+
+これを解決する方法は２つ
+
+1. コンストラクタでbindする
+
+```JavaScript
+
+class Button {
+    constructor(value) {
+        this.value = value;
+        this.click = this.click.bind(this);
+    }
+
+    click() {
+        console.log(this.value);
+    }
+}
+```
+
+2. アロー関数で書く
+
+```JavaScript
+class Button {
+    constructor(value) {
+        this.value = value;
+    }
+
+    click = () => {
+        console.log(this.value);
+    }
+}
+```

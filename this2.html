@@ -66,6 +66,9 @@
             console.log(jonas.whoIsThis()); // オブジェクトjonasを指した
 
             // 試しに後出しでf1()をjonasのメソッドとしたらどうなるか
+            function f1() {
+                return this;
+            }
             jonas.whoIAm = f1;
             console.log(jonas.whoIAm()); // オブジェクトjonasを指した
 
@@ -75,6 +78,7 @@
             var Person = function (name, age) {
                 this.name = name;
                 this.age = age;
+                this.self = this;
             };
 
             Person.prototype.whoIsThis = function () {
@@ -82,7 +86,25 @@
             };
 
             var Mike = new Person('Mike', 28);
-            console.log(Mike.whoIsThis());
+            console.log(Mike.whoIsThis()); // Mikeのインスタンス
+            console.log(Mike.self); // Mileのインスタンス
+
+            console.log('- method this ----------');
+
+            class Button {
+                constructor(value) {
+                    this.value = value;
+                    this.click = this.click.bind(this);
+                }
+
+                click() {
+                    console.log(this.value);
+                }
+            }
+
+            let button = new Button('hello');
+
+            setTimeout(button.click, 1000); // undefined
         </script>
     </body>
 </html>
