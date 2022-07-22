@@ -272,7 +272,7 @@ https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/this#%E
     console.log(Mike.self); // Mikeのインスタンス
 ```
 
-#### クラスフィールドでバインドされたメソッドを作成する
+#### クラスメソッドはthisを指定しなくてはならない
 
 クラスメソッドは明示的にthisを指定しないと、thisはメソッドの所属インスタンスを指さない
 
@@ -329,3 +329,4 @@ class Button {
     }
 }
 ```
+

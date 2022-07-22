@@ -105,6 +105,25 @@
             let button = new Button('hello');
 
             setTimeout(button.click, 1000); // undefined
+
+            console.log('- this in inherited class -----');
+
+            class closeButton extends Button {
+                // constructor(value) {
+                    // // 3. superを呼びましょう。thisを使う前に。
+                    // super(value);
+                    // // 2. bindをしようとすると、superを呼ぶ前にthisを使うなと怒られる
+                    // this.push = this.push.bind(this);
+                // }
+                push() {
+                    console.log(this);
+                    console.log(`${this.value} pushed!`);
+                }
+            }
+
+            const closebtn = new closeButton('awesome close button');
+            closebtn.click();  // awesoem close button
+            closebtn.push();    // awesome close button pushed!
         </script>
     </body>
 </html>
